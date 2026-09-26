@@ -36,3 +36,26 @@ export async function redis<T = unknown>(...cmd: (string | number)[]): Promise<T
     clearTimeout(t);
   }
 }
+
+/** Several commands in one round trip. Returns each result in order. */
+export async function pipeline(cmds: (string | number)[][]): Promise<unknown[]> {
+  const cfg = dbConfig();
+  if (!cfg) throw new Error("db_not_configured");
+  if (!cmds.length) return [];
+  const res = await fetch(cfg.url.replace(/\/$/, "") + "/pipeline", {
+    method: "POST",
+    headers: { authorization: `Bearer ${cfg.token}`, "content-type": "application/json" },
+    body: JSON.stringify(cmds),
+    cache: "no-store",
+  });
+  const json = (await res.json()) as { result?: unknown; error?: string }[];
+  if (!Array.isArray(json)) throw new Error("db_error");
+  return json.map((r) => (r.error ? null : r.result));
+}
+
+/** Fixed window rate limit. True when the caller is still under the limit. */
+export async function allow(key: string, max: number, windowSec: number): Promise<boolean> {
+  const k = `rl:${key}`;
+  const [, n] = (await pipeline([["SET", k, 0, "EX", windowSec, "NX"], ["INCR", k]])) as [unknown, number];
+  return typeof n === "number" && n <= max;
+}

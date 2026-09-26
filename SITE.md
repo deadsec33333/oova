@@ -105,3 +105,12 @@ A daylight fintech console. Mix of two references Aurimas picked: Stockcoin (chr
 - `GET /api/pay/status?to&amount&ref`: finds transactions that include the link's random reference key, then checks the receiver's USDC balance rose by at least the amount in a successful transaction. Read only.
 - Pay page and link maker poll it every 3 s (10 s after 10 minutes, only while the tab is visible) and flip to "Paid" with a Solscan receipt link, a chime and the coin flip.
 - `GET /api/health`: which keys exist and whether the RPC answers. Booleans only.
+
+## Backend 2 · wallet sign in and saved links
+- Wallet sign in, Sign In With Solana style: the server writes the message with a one time nonce (5 min, stored in Upstash), the wallet signs it, the server checks the Ed25519 signature and sets a signed httpOnly session cookie (AUTH_SECRET, 30 days). Never a transaction.
+- Wallet discovery with the Wallet Standard (Phantom, Solflare, Backpack and others) plus older injected providers. No wallet found: open in Phantom or Solflare on a phone.
+- /app is live: saved pay links per wallet (Upstash), create, copy, QR, open, two tap delete, search, tabs.
+- Open links are checked on Solana every 20 s while the dashboard is visible; paid results are stored with payer and Solscan link. Totals and the received line use real data only.
+- Google and email are shown as Soon.
+- Guards: same origin check on every write, rate limits, nonces work once, forged cookies refused. Tested end to end with a test wallet and a local stand in database.
+- /api/health now also finds Upstash vars under any prefix and pings the database.
