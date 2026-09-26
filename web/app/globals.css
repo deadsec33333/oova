@@ -585,7 +585,7 @@ html[data-theme="dark"] .island { background: #141414; box-shadow: inset 0 0 0 1
 html[data-theme="dark"] { --paper: #0a0a0a; --mist: #161616; --ink: #f4f4f4; --ink-2: #e5e5e5; --slate: #8f8f8f; --line: #232323; color-scheme: dark; }
 html[data-theme="dark"] body { background: var(--paper); color: var(--ink); }
 html[data-theme="dark"] ::selection { color: #0a0a0a; }
-html[data-theme="dark"] .tk { filter: invert(1); }
+html[data-theme="dark"] .tk-dark, html[data-theme="dark"] .tk-light { filter: invert(1); }
 html[data-theme="dark"] .phone .tk { filter: none; }
 html[data-theme="dark"] .display-chrome { background: linear-gradient(180deg, #5c5c5c 0%, #bdbdbd 55%, #ffffff 100%); -webkit-background-clip: text; background-clip: text; }
 html[data-theme="dark"] .hero-sky { background: radial-gradient(55% 55% at 25% 25%, #161616, transparent 70%), radial-gradient(45% 50% at 80% 15%, #121212, transparent 70%); }
@@ -937,3 +937,9 @@ html[data-theme="dark"] .ax-bal .tk { filter: none; }
 .lnav.is-dark .lcmd-foot { border-top-color: rgba(255,255,255,.08); }
 .lnav.is-dark .lbar-path.is-input { background: #0f0f0f; box-shadow: inset 0 0 0 1.5px #fff; }
 .lnav.is-dark .lbar-in input { color: #fff; }
+
+/* colour ticker coins (brand colours, original symbols) */
+.tk-color { background: radial-gradient(circle at 32% 26%, color-mix(in srgb, var(--c1) 60%, #fff) 0%, var(--c1) 38%, var(--c2) 100%); color: var(--fg); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--c2) 70%, #000 20%), inset 0 -5px 10px color-mix(in srgb, var(--c2) 60%, #000 40%), inset 0 2px 3px rgba(255,255,255,.35); text-shadow: 0 1px 1px color-mix(in srgb, var(--c2) 50%, #000 50%); }
+.tk-color small { opacity: .85; }
+.tk-color::before { content: ""; position: absolute; inset: 9%; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(255,255,255,.28); z-index: 1; }
+.orb-in { filter: drop-shadow(0 14px 18px rgba(0,0,0,.2)) drop-shadow(0 3px 4px rgba(0,0,0,.12)); }
