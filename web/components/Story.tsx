@@ -122,7 +122,7 @@ export default function Story() {
   }, []);
 
   return (
-    <section ref={ref} className="story" id="how" aria-label="How a payment happens">
+    <section ref={ref} className="story" id="how" aria-label="How a payment happens" data-nav="How it works">
       <div className="wrap story-inner">
         <div className="st-copy">
           <p className="kicker mono"><span className="sq" />How it works</p>

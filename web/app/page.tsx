@@ -9,6 +9,7 @@ import WordRotator from "@/components/WordRotator";
 import Loader from "@/components/Loader";
 import Motion from "@/components/Motion";
 import Story from "@/components/Story";
+import Trust from "@/components/Trust";
 import WorldGlobe from "@/components/WorldGlobe";
 import LinkMaker from "@/components/LinkMaker";
 import CopyButton from "@/components/CopyButton";
@@ -42,7 +43,7 @@ export default function Home() {
 
       <main id="top">
         {/* HERO */}
-        <section className="hero">
+        <section className="hero" data-nav="Home">
           <div className="hero-sky" aria-hidden="true" data-speed="-0.15" />
           <div className="hero-grid" aria-hidden="true" />
           <div className="wrap hero-inner">
@@ -84,7 +85,7 @@ export default function Home() {
         <Story />
 
         {/* BENTO */}
-        <section className="bento-sec wrap" aria-label="Features">
+        <section className="bento-sec wrap" aria-label="Features" data-nav="Features">
           <p className="kicker mono" data-fade><span className="sq" />Built for real money</p>
           <h2 className="h2" data-split>Everything a pay link should be. Nothing it should not.</h2>
           <div className="bento">
@@ -140,10 +141,12 @@ export default function Home() {
           </div>
         </section>
 
+        <Trust />
+
         {/* DARK: WORLD + TOOL */}
         <section className="band" data-spotlight>
           <div className="band-spot" aria-hidden="true" />
-          <div id="world" className="wrap world">
+          <div id="world" className="wrap world" data-nav="Worldwide">
             <div className="world-copy">
               <p className="kicker mono kicker-dark"><span className="sq" />Worldwide</p>
               <h2 className="h2 h2-dark" data-split>One link. Any country.</h2>
@@ -153,7 +156,7 @@ export default function Home() {
             <WorldGlobe className="world-globe" />
           </div>
 
-          <div id="make" className="wrap band-inner">
+          <div id="make" className="wrap band-inner" data-nav="Pay link">
             <p className="kicker mono kicker-dark"><span className="sq" />Live tool · real USDC</p>
             <h2 className="h2 h2-dark" data-split>Make a pay link now.</h2>
             <p className="lead lead-dark" data-fade>Works today on Solana mainnet. Try it with a small amount first.</p>
@@ -162,7 +165,7 @@ export default function Home() {
         </section>
 
         {/* WHO */}
-        <section className="who wrap" aria-label="Who it is for">
+        <section className="who wrap" aria-label="Who it is for" data-nav="For you">
           <p className="kicker mono" data-fade><span className="sq" />For anyone paid from far away</p>
           <ul className="who-list" data-stagger>
             <li><span className="who-ico"><Briefcase size={20} /></span><span className="mono">Freelancers</span><p>Send one link with your invoice. Get paid in dollars, not in waiting.</p></li>
@@ -173,7 +176,7 @@ export default function Home() {
         </section>
 
         {/* LORE */}
-        <section className="lore" aria-label="The story">
+        <section className="lore" aria-label="The story" data-nav="The coin">
           <div className="wrap">
             <p className="kicker mono" data-fade><span className="sq" />The coin with no face</p>
             <p className="lore-line" data-scrub>Every coin in history carried a face. A king, a president, a flag. Qova was struck with no face. Just a circle, and a tail that points to whoever needs it next. It closes the distance between work and pay.</p>
@@ -181,7 +184,7 @@ export default function Home() {
         </section>
 
         {/* $QOVA */}
-        <section id="coin" className="coinsec wrap">
+        <section id="coin" className="coinsec wrap" data-nav="$QOVA">
           <div className="coinsec-text">
             <p className="kicker mono" data-fade><span className="sq" />$QOVA</p>
             <h2 className="h2" data-split>The meme behind the link.</h2>
@@ -210,7 +213,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="join wrap" aria-label="Community">
+        <section className="join wrap" aria-label="Community" data-nav="Community">
           <div>
             <p className="kicker mono" data-fade><span className="sq" />Community</p>
             <h2 className="h2" data-split>Be one of the Linked.</h2>
@@ -226,7 +229,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="faq" className="faq wrap">
+        <section id="faq" className="faq wrap" data-nav="FAQ">
           <p className="kicker mono" data-fade><span className="sq" />FAQ</p>
           <h2 className="h2" data-split>Plain answers.</h2>
           <div className="faq-list" data-stagger>
@@ -246,7 +249,14 @@ export default function Home() {
             <span className="brand"><Logo /></span>
             <Btn href="#make" variant="light" size="sm">Make a link</Btn>
           </div>
-          <p className="disclaimer">$QOVA is a memecoin with no intrinsic value and no expectation of profit. It is not a dollar or a stablecoin and its price can go to zero. QOVA pay links are a free, non custodial demo: payments go straight between wallets and QOVA never holds, moves or converts money. USDC is issued by Circle, not by QOVA. Check the rules where you live. Not financial advice.</p>
+          <div className="foot-cols">
+            <div><span className="mono">Product</span><a href="#make">Make a pay link</a><a href="#how">How it works</a><a href="#trust">Security</a><a href="/app">Sign in</a></div>
+            <div><span className="mono">$QOVA</span><a href="#coin">Launch status</a><a href="#coin">Anti scam</a><a href="#faq">FAQ</a></div>
+            <div><span className="mono">Built on</span><span className="foot-chip"><TokenIcon kind="sol" size={20} /> Solana</span><span className="foot-chip"><TokenIcon kind="usdc" size={20} /> USDC by Circle</span><span className="foot-chip">Solana Pay standard</span></div>
+            <div><span className="mono">Social</span><span className="muted-soon">X · soon</span><span className="muted-soon">Telegram · soon</span><span className="muted-soon">TikTok · soon</span></div>
+          </div>
+          <p className="disclaimer" id="risk"><b>Risk disclosure.</b> $QOVA is a memecoin with no intrinsic value and no expectation of profit. It is not a dollar or a stablecoin and its price can go to zero. QOVA pay links are a free, non custodial demo: payments go straight between wallets and QOVA never holds, moves or converts money. USDC is issued by Circle, not by QOVA. Check the rules where you live. Not financial advice.</p>
+          <p className="foot-base mono"><span>© 2026 QOVA</span><span>Not a bank. Not a wallet. A link.</span></p>
         </div>
         <div className="foot-word" aria-hidden="true">QOVA</div>
       </footer>

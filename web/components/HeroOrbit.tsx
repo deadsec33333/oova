@@ -3,8 +3,8 @@ import { useEffect, useRef } from "react";
 import TokenIcon, { type TokenKind } from "./TokenIcon";
 
 const ORBIT: { k: TokenKind; s: number }[] = [
-  { k: "usdc", s: 56 }, { k: "ngn", s: 42 }, { k: "sol", s: 50 }, { k: "php", s: 40 }, { k: "usdc", s: 46 },
-  { k: "brl", s: 42 }, { k: "qova", s: 48 }, { k: "kes", s: 40 }, { k: "idr", s: 40 },
+  { k: "sol", s: 60 }, { k: "bonk", s: 46 }, { k: "usdc", s: 56 }, { k: "wif", s: 44 }, { k: "btc", s: 48 },
+  { k: "popcat", s: 46 }, { k: "doge", s: 50 }, { k: "eth", s: 44 }, { k: "jup", s: 42 },
 ];
 
 /** Glossy tokens orbiting the coin on a tilted ellipse, passing behind and in front of it. */

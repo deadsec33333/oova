@@ -1,6 +1,6 @@
 /**
  * QOVA sound engine. Everything is synthesised with Web Audio, no files.
- * Off by default; turned on only by a click (browsers require a gesture).
+ * Interaction sounds only, no background audio. Off by default; turned on only by a click.
  */
 type Voice = "tick" | "tap" | "chime" | "whoosh" | "ping" | "swoosh" | "key";
 
@@ -8,7 +8,6 @@ class SoundEngine {
   ctx: AudioContext | null = null;
   master: GainNode | null = null;
   analyser: AnalyserNode | null = null;
-  drone: { stop: () => void } | null = null;
   on = false;
   last: Record<string, number> = {};
 
@@ -30,7 +29,6 @@ class SoundEngine {
     this.on = true;
     this.master!.gain.cancelScheduledValues(ctx.currentTime);
     this.master!.gain.setTargetAtTime(0.9, ctx.currentTime, 0.15);
-    this.startDrone();
     this.play("chime");
   }
 
@@ -39,23 +37,7 @@ class SoundEngine {
     this.play("tap");
     const t = this.ctx.currentTime;
     this.master.gain.setTargetAtTime(0.0001, t + 0.08, 0.12);
-    setTimeout(() => { this.drone?.stop(); this.drone = null; }, 700);
     this.on = false;
-  }
-
-  /** A quiet, slowly breathing pad so the equalizer has something to show. */
-  private startDrone() {
-    const ctx = this.ctx!; if (this.drone) return;
-    const out = ctx.createGain(); out.gain.value = 0;
-    const filter = ctx.createBiquadFilter(); filter.type = "lowpass"; filter.frequency.value = 420; filter.Q.value = 0.6;
-    const lfo = ctx.createOscillator(); lfo.frequency.value = 0.07;
-    const lfoGain = ctx.createGain(); lfoGain.gain.value = 180;
-    lfo.connect(lfoGain); lfoGain.connect(filter.frequency);
-    const oscs = [110, 164.81, 220.5].map((f, i) => { const o = ctx.createOscillator(); o.type = i === 1 ? "triangle" : "sine"; o.frequency.value = f; o.detune.value = (i - 1) * 6; o.connect(filter); o.start(); return o; });
-    filter.connect(out); out.connect(this.master!);
-    lfo.start();
-    out.gain.setTargetAtTime(0.022, ctx.currentTime, 1.2);
-    this.drone = { stop: () => { const t = ctx.currentTime; out.gain.setTargetAtTime(0, t, 0.2); setTimeout(() => { oscs.forEach((o) => o.stop()); lfo.stop(); }, 900); } };
   }
 
   private env(g: GainNode, t: number, peak: number, a: number, d: number) {

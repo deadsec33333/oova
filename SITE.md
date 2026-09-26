@@ -76,3 +76,11 @@ A daylight fintech console. Mix of two references Aurimas picked: Stockcoin (chr
 - Orbit tokens are glossy, larger, never faded or blurred, pop in on load and bob.
 - Sound design, all synthesised with Web Audio (no files), off by default: hover ticks, taps, keypad clicks in the story, whoosh per story step, a cash ping when the payment arrives, a chime when a link is made, a swoosh on theme change, and a quiet breathing pad. The floating sound button is a live equalizer driven by the real audio output; one click turns everything off.
 - Scrolling currency rail removed. USDC labels next to big numbers no longer squished.
+
+## v5: island nav, trust, ticker coins, app design (26 Sep 2026)
+- Nav is now a black dynamic island: logo with a scroll progress ring, the current section name and number (rolling in), theme button, Sign in, Make a link. It expands into all links at the top of the page or on hover; phones get the full screen menu.
+- Orbit coins: SOL, USDC, BONK, WIF, POPCAT, DOGE, BTC, ETH, JUP as glossy monochrome ticker coins in HTML (not SVG text, fixes the black boxes some browsers drew). Not official logos.
+- Sound: interaction sounds only, the background pad is gone.
+- New "Safe by design" section: animated money flow (payer wallet, Solana, your wallet, with QOVA outside the path), four trust pillars, and an interactive breakdown of what a pay link contains.
+- Footer with link columns, "Built on" (Solana, USDC by Circle, Solana Pay standard) and a risk disclosure anchor.
+- /app: design preview of the signed in product. Sign in with a wallet (shows the exact free message to sign, never a transaction), Google or email. Dashboard with received this month, quick link, pay links table, live activity, connected accounts, sidebar on desktop and a tab bar on phones. All sample data, clearly marked; nothing connects yet.
