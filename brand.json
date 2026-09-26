@@ -1,0 +1,17 @@
+{
+  "name": "",
+  "ticker": "",
+  "chain": "solana",
+  "contract": "",
+  "niche": { "seeds": [], "community": "", "where_they_gather": [] },
+  "concept": { "one_liner": "", "twist": "", "scores": {} },
+  "mascot": { "description": "", "material": "", "medium": "", "anatomy_twist": "", "signature_behaviour": "", "default_emotion": "", "reference_images": [], "prompts": [], "idle_video": "" },
+  "world": "",
+  "lore": { "format": "", "origin": "", "canon": [], "open_threads": [], "season": [] },
+  "palette": {},
+  "fonts": {},
+  "voice": { "do": [], "dont": [], "catchphrase": "", "holder_name": "" },
+  "socials": { "x": "", "telegram": "", "tiktok": "", "instagram": "", "discord": "" },
+  "meme_templates": [],
+  "disclaimer": ""
+}
