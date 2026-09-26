@@ -868,3 +868,72 @@ html[data-theme="dark"] .ax-bal .tk { filter: none; }
 .ax-tabbar button { flex-direction: column; gap: 3px; justify-content: center; min-height: 52px; padding: 0; color: #8a8a8a; font-size: 10.5px; }
 .ax-tabbar button.is-on { color: #0a0a0a; background: #fff; }
 @media (min-width: 1000px) { .ax-tabbar { display: none; } }
+
+/* =================== nav: the link bar =================== */
+.lnav { position: fixed; top: 12px; left: 0; right: 0; z-index: 90; display: flex; justify-content: center; padding: 0 10px; pointer-events: none; }
+.lnav-wrap { pointer-events: auto; position: relative; width: 100%; max-width: 640px; }
+.lbar { position: relative; z-index: 2; display: flex; align-items: center; gap: 6px; height: 56px; padding: 6px; border-radius: 20px; background: rgba(255,255,255,.72); backdrop-filter: saturate(1.8) blur(22px); -webkit-backdrop-filter: saturate(1.8) blur(22px); box-shadow: inset 0 0 0 1px rgba(10,10,10,.07), 0 1px 0 rgba(255,255,255,.9) inset, 0 22px 50px -26px rgba(0,0,0,.4); transition: background .45s, box-shadow .45s, border-radius .45s var(--ease); }
+.lnav.is-open .lbar { border-radius: 20px 20px 8px 8px; }
+.lbar-mark { flex: none; width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: #0a0a0a; color: #fff; transition: transform .5s var(--ease); }
+.lbar-mark:hover { transform: rotate(-8deg) scale(1.05); }
+.lbar-path { position: relative; flex: 1; min-width: 0; height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 8px 0 14px; border: 0; border-radius: 13px; background: rgba(10,10,10,.045); color: var(--ink); cursor: text; overflow: hidden; font: inherit; text-align: left; transition: background .3s, box-shadow .3s; }
+.lbar-path:hover { background: rgba(10,10,10,.07); }
+.lbar-path.is-input { background: #fff; box-shadow: inset 0 0 0 1.5px #0a0a0a; cursor: text; }
+.lbar-fill { position: absolute; inset: 0; background: rgba(10,10,10,.05); transform-origin: 0 50%; transform: scaleX(0); pointer-events: none; }
+.lbar-in { position: relative; flex: 1; min-width: 0; display: flex; align-items: center; font-family: var(--mono); font-size: 14px; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; }
+.lbar-root { color: #8a8a8a; }
+.lbar-slug { color: var(--ink); font-weight: 600; }
+.lbar-caret { display: inline-block; width: 8px; height: 17px; margin-left: 2px; border-radius: 1.5px; background: var(--ink); animation: caret 1.05s steps(1) infinite; }
+.lbar-in input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font: 600 14px var(--mono); color: #0a0a0a; padding: 0; }
+.lbar-in input::placeholder { color: #b0b0b0; font-weight: 400; }
+.lbar-kbd { flex: none; position: relative; height: 26px; padding: 0 8px; display: inline-grid; place-items: center; border: 0; border-radius: 7px; font-size: 10.5px; color: var(--slate); background: #fff; box-shadow: inset 0 0 0 1px rgba(10,10,10,.1), 0 1.5px 0 rgba(10,10,10,.08); cursor: pointer; }
+.lbar-right { flex: none; display: flex; align-items: center; gap: 6px; }
+.lbar .theme-btn { width: 44px; height: 44px; border-radius: 13px; background: rgba(10,10,10,.045); }
+.lbar .theme-btn:hover { background: rgba(10,10,10,.09); }
+.lbar-cta { display: none; height: 44px; padding: 0 8px 0 16px; align-items: center; gap: 8px; border-radius: 13px; background: #0a0a0a; color: #fff; font-size: 13.5px; font-weight: 500; white-space: nowrap; transition: transform .3s var(--ease); }
+.lbar-cta svg { width: 28px; height: 28px; padding: 6px; border-radius: 9px; background: #fff; color: #0a0a0a; transition: transform .5s var(--ease); }
+.lbar-cta:hover svg { transform: rotate(45deg); }
+.lbar-cta:active { transform: scale(.96); }
+@media (min-width: 760px) { .lbar-cta { display: inline-flex; } .lnav { top: 16px; } }
+@media (max-width: 420px) { .lbar-kbd { display: none; } .lbar-in { font-size: 13px; } }
+
+/* command bar */
+.lcmd { position: absolute; z-index: 1; left: 0; right: 0; top: 58px; padding: 8px; border-radius: 8px 8px 22px 22px; background: rgba(255,255,255,.9); backdrop-filter: saturate(1.8) blur(22px); -webkit-backdrop-filter: saturate(1.8) blur(22px); box-shadow: inset 0 0 0 1px rgba(10,10,10,.07), 0 40px 80px -30px rgba(0,0,0,.45); max-height: min(70vh, 560px); overflow: auto; opacity: 0; transform: translateY(-10px) scale(.98); transform-origin: 50% 0; pointer-events: none; visibility: hidden; transition: opacity .3s var(--ease), transform .45s var(--ease), visibility 0s .45s; color: #0a0a0a; }
+.lnav.is-open .lcmd { opacity: 1; transform: none; pointer-events: auto; visibility: visible; transition: opacity .3s var(--ease), transform .45s var(--ease); }
+.lcmd-head { display: flex; align-items: center; gap: 8px; padding: 8px 10px 6px; font-size: 10.5px; color: #8a8a8a; }
+.lcmd-row { width: 100%; display: grid; grid-template-columns: 26px 30px 1fr auto 18px; align-items: center; gap: 10px; min-height: 56px; padding: 8px 10px; border: 0; border-radius: 14px; background: none; color: #0a0a0a; font: inherit; text-align: left; cursor: pointer; transition: background .2s; }
+.lnav.is-open .lcmd-row { animation: secIn .45s var(--ease) both; }
+.lnav.is-open .lcmd-row:nth-child(3) { animation-delay: .03s; } .lnav.is-open .lcmd-row:nth-child(4) { animation-delay: .06s; } .lnav.is-open .lcmd-row:nth-child(5) { animation-delay: .09s; } .lnav.is-open .lcmd-row:nth-child(6) { animation-delay: .12s; } .lnav.is-open .lcmd-row:nth-child(7) { animation-delay: .15s; } .lnav.is-open .lcmd-row:nth-child(8) { animation-delay: .18s; } .lnav.is-open .lcmd-row:nth-child(9) { animation-delay: .21s; }
+.lcmd-row.is-on { background: #0a0a0a; color: #fff; }
+.lcmd-n { font-size: 10px; color: #a3a3a3; }
+.lcmd-ico { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: rgba(10,10,10,.06); }
+.lcmd-row.is-on .lcmd-ico { background: rgba(255,255,255,.14); }
+.lcmd-t { display: grid; line-height: 1.25; min-width: 0; }
+.lcmd-t b { font-weight: 500; font-size: 15px; }
+.lcmd-t .mono { font-size: 10.5px; color: #8a8a8a; text-transform: none; letter-spacing: 0; }
+.lcmd-row.is-on .lcmd-t .mono, .lcmd-row.is-on .lcmd-n { color: #8a8a8a; }
+.lcmd-hint { font-size: 12.5px; color: #8a8a8a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
+.lcmd-enter { opacity: 0; transition: opacity .2s; }
+.lcmd-row.is-on .lcmd-enter { opacity: 1; }
+.lcmd-row.is-here .lcmd-t b::after { content: "you are here"; margin-left: 8px; font: 500 9.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; padding: 2px 6px; border-radius: 999px; box-shadow: inset 0 0 0 1px currentColor; opacity: .55; vertical-align: 2px; }
+.lcmd-empty { padding: 18px 12px; color: #6b6b6b; font-size: 14px; }
+.lcmd-foot { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 10px 10px 4px; margin-top: 6px; border-top: 1px solid rgba(10,10,10,.07); font-size: 10px; color: #a3a3a3; }
+.lcmd-theme { display: none; }
+@media (max-width: 640px) { .lcmd-hint, .lcmd-n { display: none; } .lcmd-row { grid-template-columns: 30px 1fr 18px; } }
+
+/* dark surfaces and black edition */
+.lnav.is-dark .lbar { background: rgba(22,22,22,.72); box-shadow: inset 0 0 0 1px rgba(255,255,255,.09), 0 22px 50px -26px rgba(0,0,0,.8); }
+.lnav.is-dark .lbar-mark { background: #fff; color: #0a0a0a; }
+.lnav.is-dark .lbar-path { background: rgba(255,255,255,.06); color: #fff; }
+.lnav.is-dark .lbar-path:hover { background: rgba(255,255,255,.1); }
+.lnav.is-dark .lbar-fill { background: rgba(255,255,255,.06); }
+.lnav.is-dark .lbar-slug { color: #fff; } .lnav.is-dark .lbar-caret { background: #fff; }
+.lnav.is-dark .lbar-kbd { background: #1c1c1c; color: #a3a3a3; box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); }
+.lnav.is-dark .lbar .theme-btn { background: rgba(255,255,255,.08); color: #fff; }
+.lnav.is-dark .lbar-cta { background: #fff; color: #0a0a0a; } .lnav.is-dark .lbar-cta svg { background: #0a0a0a; color: #fff; }
+.lnav.is-dark .lcmd { background: rgba(20,20,20,.94); color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.09), 0 40px 80px -30px rgba(0,0,0,.9); }
+.lnav.is-dark .lcmd-row { color: #fff; } .lnav.is-dark .lcmd-row.is-on { background: #fff; color: #0a0a0a; }
+.lnav.is-dark .lcmd-ico { background: rgba(255,255,255,.08); } .lnav.is-dark .lcmd-row.is-on .lcmd-ico { background: rgba(10,10,10,.08); }
+.lnav.is-dark .lcmd-foot { border-top-color: rgba(255,255,255,.08); }
+.lnav.is-dark .lbar-path.is-input { background: #0f0f0f; box-shadow: inset 0 0 0 1.5px #fff; }
+.lnav.is-dark .lbar-in input { color: #fff; }

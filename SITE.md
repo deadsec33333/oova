@@ -84,3 +84,8 @@ A daylight fintech console. Mix of two references Aurimas picked: Stockcoin (chr
 - New "Safe by design" section: animated money flow (payer wallet, Solana, your wallet, with QOVA outside the path), four trust pillars, and an interactive breakdown of what a pay link contains.
 - Footer with link columns, "Built on" (Solana, USDC by Circle, Solana Pay standard) and a risk disclosure anchor.
 - /app: design preview of the signed in product. Sign in with a wallet (shows the exact free message to sign, never a transaction), Google or email. Dashboard with received this month, quick link, pay links table, live activity, connected accounts, sidebar on desktop and a tab bar on phones. All sample data, clearly marked; nothing connects yet.
+
+## v6: the link bar nav (26 Sep 2026)
+- The nav is a link: `qova/how-it-works`. It deletes and retypes itself, character by character with a block caret, as you scroll into each section; the path field fills softly with scroll progress.
+- Click it, press ⌘K / Ctrl K or `/`: it becomes an input and a command bar drops down. Type to filter (ranked by slug, then name, then description), arrows to move, enter to go, esc to close. Marks "you are here". Same on phones.
+- Dark glass automatically over dark sections and in the black edition. Typing clicks when sound is on.
