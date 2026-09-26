@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { rpc } from "@/lib/rpc";
+import { dbConfig, redis } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -8,10 +9,14 @@ export async function GET() {
   const has = (k: string) => Boolean(process.env[k]);
   let rpcOk = false;
   if (has("SOLANA_RPC")) { try { await rpc<number>("getSlot", []); rpcOk = true; } catch { rpcOk = false; } }
+  const db = Boolean(dbConfig());
+  let dbOk = false;
+  if (db) { try { dbOk = (await redis<string>("PING")) === "PONG"; } catch { dbOk = false; } }
   return NextResponse.json({
     solanaRpc: has("SOLANA_RPC"),
     solanaRpcReachable: rpcOk,
-    database: has("KV_REST_API_URL") || has("UPSTASH_REDIS_REST_URL"),
+    database: db,
+    databaseReachable: dbOk,
     authSecret: has("AUTH_SECRET"),
     google: has("AUTH_GOOGLE_ID") && has("AUTH_GOOGLE_SECRET"),
     email: has("AUTH_RESEND_KEY"),
