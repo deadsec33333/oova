@@ -1,17 +1,66 @@
 {
-  "name": "",
-  "ticker": "",
+  "name": "QOVA",
+  "ticker": "QOVA",
   "chain": "solana",
   "contract": "",
-  "niche": { "seeds": [], "community": "", "where_they_gather": [] },
-  "concept": { "one_liner": "", "twist": "", "scores": {} },
-  "mascot": { "description": "", "material": "", "medium": "", "anatomy_twist": "", "signature_behaviour": "", "default_emotion": "", "reference_images": [], "prompts": [], "idle_video": "" },
-  "world": "",
-  "lore": { "format": "", "origin": "", "canon": [], "open_threads": [], "season": [] },
-  "palette": {},
-  "fonts": {},
-  "voice": { "do": [], "dont": [], "catchphrase": "", "holder_name": "" },
+  "entry_door": "engine",
+  "niche": {
+    "seeds": ["remote work and freelancing", "family remittances", "small shops paid from far away", "stable digital dollars"],
+    "community": "people in Africa, Latin America and Southeast Asia who want USDC instead of weak local money, plus anyone paid from far away",
+    "where_they_gather": ["freelancer and remote work communities", "Solana community", "diaspora groups", "Telegram groups in Nigeria, Kenya, Ghana, Argentina, Brazil, the Philippines, Indonesia"]
+  },
+  "concept": {
+    "one_liner": "Dollars for everyone, one link away.",
+    "three_second_line": "Send a link. Get dollars.",
+    "twist": "a memecoin with a real free tool: non custodial USDC pay links on Solana. The coin is the meme, the link is the utility, and the link works without the coin."
+  },
+  "engine": {
+    "lane": "C (tool for people, not traders) + real payments",
+    "pitch": "Make a link, anyone pays it from any Solana wallet, you get the exact amount in USDC.",
+    "loop": {
+      "first_10_seconds": "type your address and an amount, get a link and a QR",
+      "first_day": "send it to a client or family member, see it paid",
+      "week_4": "link history, first links map, community firsts"
+    },
+    "surfaces": ["website"],
+    "architecture": {
+      "onchain": "Solana Pay transfer request: USDC SPL transfer from payer wallet to receiver wallet, with a reference key",
+      "server": "none in the foundation; later a read only payment check by reference via RPC",
+      "owner_machine": "nothing"
+    },
+    "data_sources": ["Solana Pay spec", "USDC mint EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"],
+    "mvp": "pay link maker + pay page with QR and wallet deep link",
+    "v2": "payment confirmation by reference, link history, card on ramp (researched separately)",
+    "moonshot": "pay by card or Apple Pay, receiver gets USDC",
+    "abuse_cases": ["impersonation pay links (mitigation: pay page shows full address and a warning, never promises who owns it)", "phishing clones (mitigation: anti scam line, official links only on site and pinned X)"],
+    "risks": ["payments rules differ by country: check local rules", "users confusing $QOVA with a stable dollar: clear copy near the top"]
+  },
+  "mascot": {
+    "description": "a heavy polished chrome coin shaped like the letter Q; the circle is the coin, the tail is the link",
+    "material": "mirror chrome",
+    "medium": "clean 3D render, CSS and SVG on the site",
+    "anatomy_twist": "the tail stretches to whoever needs paying",
+    "signature_behaviour": "tilts toward the cursor, flips when a link is made, glows mint when money lands",
+    "default_emotion": "calm, confident",
+    "states": ["idle", "made", "paid", "asleep"]
+  },
+  "world": "daylight fintech console with a halftone dot globe; one dark band holds the real tool",
+  "lore": {
+    "format": "short one line transmissions",
+    "origin": "every coin in history carried a face; Qova was struck with no face, just a circle and a tail that points to whoever needs it next",
+    "canon": ["no face on purpose", "the tail is the link", "never holds money", "mint means arrived", "Link #1 is canon", "calm, never hype"],
+    "engine_canon_events": ["first link paid", "first link per country", "1,000th link", "first link between two continents"],
+    "open_threads": ["who made Link #1", "a coin with a face that wants to become Qova", "the tail that points everywhere"]
+  },
+  "palette": { "paper": "#FFFFFF", "mist": "#F4F6F8", "ink": "#070B14", "slate": "#5B6472", "line": "#E3E7EC", "chrome_hi": "#FFFFFF", "chrome_mid": "#C9CFD6", "chrome_lo": "#7D8793", "mint": "#19C39B", "sky": "#BFE6FF", "night": "#080B12" },
+  "fonts": { "display": "Geist 300 to 500", "body": "Geist", "mono": "Geist Mono" },
+  "voice": {
+    "do": ["short sentences", "real numbers", "plain words", "respect the reader's money", "name cities, not stereotypes"],
+    "dont": ["profit promises", "hype words", "calling $QOVA stable", "DMs first", "dashes"],
+    "catchphrase": "One link away.",
+    "greeting": "linked.",
+    "holder_name": "the Linked"
+  },
   "socials": { "x": "", "telegram": "", "tiktok": "", "instagram": "", "discord": "" },
-  "meme_templates": [],
-  "disclaimer": ""
+  "disclaimer": "$QOVA is a memecoin with no intrinsic value and no expectation of profit. It is not a dollar or a stablecoin and its price can go to zero. QOVA pay links are a free, non custodial demo: payments go straight between wallets and QOVA never holds, moves or converts money. USDC is issued by Circle, not by QOVA. Check the rules where you live. Not financial advice."
 }

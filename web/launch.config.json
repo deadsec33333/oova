@@ -1,6 +1,6 @@
 {
   "_read_me": "PUBLIC FILE. Only addresses and links. Never a private key, seed phrase or password. Empty values keep that part of the site in preview mode.",
-  "token": { "ca": "", "symbol": "", "decimals": 6, "launchpad": "pump.fun", "pair": "", "launchedAt": "" },
+  "token": { "ca": "", "symbol": "QOVA", "decimals": 6, "launchpad": "pump.fun", "pair": "", "launchedAt": "" },
   "wallets": { "dev": "", "prizes": "" },
   "links": { "x": "", "caPinnedOnX": false, "telegram": "", "discord": "", "tiktok": "", "instagram": "" }
 }

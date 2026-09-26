@@ -9,7 +9,7 @@ A memecoin concept and a free pay link demo: someone sends you a link, anyone pa
 | `web/` | Next.js site (Vercel root directory) |
 | `BRAND.md`, `brand.json` | Brand, lore, voice, X plan |
 | `CHECKLIST.md` | Build checklist for this coin |
-| `launch.config.json` | Public addresses and links only |
+| `web/launch.config.json` | Public addresses and links only (single source of truth) |
 | `LESSONS.md` | What worked, what to fix |
 
 Part of the memecoin portfolio. Never commit keys, seed phrases or `.env` files.
