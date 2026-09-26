@@ -11,7 +11,7 @@ import Story from "@/components/Story";
 import WorldGlobe from "@/components/WorldGlobe";
 import LinkMaker from "@/components/LinkMaker";
 import CopyButton from "@/components/CopyButton";
-import TokenIcon, { type TokenKind } from "@/components/TokenIcon";
+import TokenIcon from "@/components/TokenIcon";
 import { launch } from "@/lib/launch";
 
 const socials: { name: string; href: string }[] = [
@@ -21,10 +21,6 @@ const socials: { name: string; href: string }[] = [
   { name: "Instagram", href: launch.links.instagram },
 ];
 
-const CURRENCIES: { k: TokenKind; code: string }[] = [
-  { k: "ngn", code: "NGN" }, { k: "php", code: "PHP" }, { k: "brl", code: "BRL" }, { k: "kes", code: "KES" },
-  { k: "idr", code: "IDR" }, { k: "pen", code: "PEN" }, { k: "ars", code: "ARS" }, { k: "ghs", code: "GHS" }, { k: "mxn", code: "MXN" },
-];
 
 const faq = [
   ["Do I need $QOVA to use a pay link?", "No. Pay links move USDC, a digital dollar issued by Circle. They work for anyone with a Solana wallet, with or without the coin."],
@@ -73,19 +69,6 @@ export default function Home() {
                 <span><small className="mono">Arrived · sample</small><b>Lagos → Lima</b></span>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* CURRENCY MARQUEE */}
-        <section className="rail" aria-label="From any currency to digital dollars">
-          <div className="rail-track">
-            {[0, 1].map((r) => (
-              <div className="rail-row" key={r} aria-hidden={r === 1}>
-                {CURRENCIES.map((c) => (
-                  <span className="rail-chip" key={c.code + r}><TokenIcon kind={c.k} size={26} /><span className="mono">{c.code}</span><span className="rail-arrow">→</span><TokenIcon kind="usdc" size={26} /><span className="mono">USDC</span></span>
-                ))}
-              </div>
-            ))}
           </div>
         </section>
 
