@@ -89,3 +89,8 @@ A daylight fintech console. Mix of two references Aurimas picked: Stockcoin (chr
 - The nav is a link: `qova/how-it-works`. It deletes and retypes itself, character by character with a block caret, as you scroll into each section; the path field fills softly with scroll progress.
 - Click it, press ⌘K / Ctrl K or `/`: it becomes an input and a command bar drops down. Type to filter (ranked by slug, then name, then description), arrows to move, enter to go, esc to close. Marks "you are here". Same on phones.
 - Dark glass automatically over dark sections and in the black edition. Typing clicks when sound is on.
+
+## v7: official token art, calmer orbit, trust rebuilt (27 Sep 2026)
+- SOL, DOGE and USDC use the official artwork Aurimas supplied (web/public/tokens), cropped into glossy coins with rim, shine and shadow. Other coins stay as brand colour ticker coins until their files are supplied.
+- Orbit coins always float above the big coin, on a wider, calmer ellipse.
+- Security section rebuilt as a dark cinematic panel right after the story: "We can't touch your money. Not won't. Can't." with scroll lit words, a Typical app vs QOVA switch (coins get stuck in "their account" vs fly straight to you, labelled illustration), four counters that count down to an honest 0, and "Don't trust us. Verify." with the link anatomy and links to the Solana Pay spec and USDC.

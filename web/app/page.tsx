@@ -84,6 +84,8 @@ export default function Home() {
         {/* STORY */}
         <Story />
 
+        <Trust />
+
         {/* BENTO */}
         <section className="bento-sec wrap" aria-label="Features" data-nav="Features">
           <p className="kicker mono" data-fade><span className="sq" />Built for real money</p>
@@ -140,8 +142,6 @@ export default function Home() {
             <span className="works-chip"><UserX size={16} /> no sign up</span>
           </div>
         </section>
-
-        <Trust />
 
         {/* DARK: WORLD + TOOL */}
         <section className="band" data-spotlight>

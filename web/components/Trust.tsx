@@ -1,40 +1,37 @@
-import { Ban, BookOpen, KeyRound, Network, ScanSearch, ShieldCheck, Wallet, WalletMinimal } from "lucide-react";
-import { Mark } from "./Logo";
-import TokenIcon from "./TokenIcon";
+import { ArrowUpRight, ShieldCheck } from "lucide-react";
+import Compare from "./Compare";
+import Zeros from "./Zeros";
 import LinkAnatomy from "./LinkAnatomy";
 
-/** Safe by design: how money moves, what QOVA can and cannot do. */
+/** Safe by design. The feeling: we can't touch your money, and you can check that yourself. */
 export default function Trust() {
   return (
-    <section id="trust" className="trust wrap" data-nav="Security" aria-label="Security">
-      <div className="trust-top">
-        <div>
-          <p className="kicker mono" data-fade><span className="sq" />Safe by design</p>
-          <h2 className="h2" data-split>Your money never touches us.</h2>
+    <section id="trust" className="trust2" data-nav="Security" aria-label="Security" data-spotlight>
+      <div className="t2-glow" aria-hidden="true" />
+      <div className="wrap t2-head">
+        <p className="kicker mono kicker-dark"><span className="sq" />Safe by design</p>
+        <h2 className="t2-title" data-scrub>We can&apos;t touch your money.</h2>
+        <p className="t2-sub" data-fade>Not won&apos;t. <b>Can&apos;t.</b></p>
+        <p className="t2-lead" data-fade>QOVA only writes the link. The payment goes from your client&apos;s wallet straight into yours on Solana. There is no QOVA account in the middle, so there is nothing for us, or anyone who hacks us, to hold, freeze or take.</p>
+      </div>
+
+      <div className="wrap" data-fade><Compare /></div>
+
+      <div className="wrap" data-fade><Zeros /></div>
+
+      <div className="wrap t2-verify">
+        <div className="t2-v-copy">
+          <p className="kicker mono kicker-dark"><span className="sq" />Check, don&apos;t trust</p>
+          <h3 data-split>Don&apos;t trust us. Verify.</h3>
+          <p>Every QOVA link is plain, readable data. Every payment leaves a public receipt on Solana that anyone can look up. Here is exactly what a link contains.</p>
+          <div className="t2-v-links">
+            <a href="https://docs.solanapay.com" target="_blank" rel="noopener">Solana Pay spec <ArrowUpRight size={14} /></a>
+            <a href="https://www.circle.com/usdc" target="_blank" rel="noopener">About USDC <ArrowUpRight size={14} /></a>
+            <span><ShieldCheck size={14} /> We will never DM you or ask for a seed phrase</span>
+          </div>
         </div>
-        <p className="lead" data-fade>QOVA writes a link. Your client&apos;s wallet sends USDC straight to yours on Solana. We never hold funds, never ask for keys and there is nothing to sign on this site.</p>
+        <div data-fade><LinkAnatomy /></div>
       </div>
-
-      <div className="flow2" data-fade aria-label="Money goes from the payer's wallet over Solana to your wallet. QOVA is not in the path.">
-        <div className="f2-node"><span className="f2-ico"><Wallet size={20} /></span><b>Payer&apos;s wallet</b><span className="mono">Phantom · Solflare · any</span></div>
-        <div className="f2-wire" aria-hidden="true"><span className="f2-pkt"><TokenIcon kind="usdc" size={26} /></span><span className="f2-pkt f2-pkt-2"><TokenIcon kind="usdc" size={22} /></span></div>
-        <div className="f2-node f2-mid"><span className="f2-ico"><Network size={20} /></span><b>Solana network</b><span className="mono">public, settles in seconds</span></div>
-        <div className="f2-wire" aria-hidden="true"><span className="f2-pkt f2-pkt-3"><TokenIcon kind="usdc" size={26} /></span></div>
-        <div className="f2-node f2-end"><span className="f2-ico"><WalletMinimal size={20} /></span><b>Your wallet</b><span className="mono">exact amount, yours</span></div>
-        <div className="f2-q" aria-hidden="true">
-          <span className="f2-q-line" />
-          <div className="f2-qbox"><Mark size={18} /><div><b>QOVA</b><span className="mono">writes the link only</span></div><span className="f2-ban"><Ban size={16} /> no access to funds</span></div>
-        </div>
-      </div>
-
-      <div className="pillars" data-stagger>
-        <article className="pillar"><ShieldCheck size={22} /><h3>Non custodial</h3><p>No balance with us. Nothing to freeze, nothing to hack, nothing to withdraw.</p></article>
-        <article className="pillar"><KeyRound size={22} /><h3>No keys, no signing</h3><p>Making a link needs no wallet connection. We never ask for a seed phrase. Ever.</p></article>
-        <article className="pillar"><BookOpen size={22} /><h3>Open standard</h3><p>Links follow Solana Pay, a public spec that major Solana wallets support.</p></article>
-        <article className="pillar"><ScanSearch size={22} /><h3>Public receipts</h3><p>Every payment is visible on Solana explorers. Anyone can check it.</p></article>
-      </div>
-
-      <div data-fade><LinkAnatomy /></div>
     </section>
   );
 }

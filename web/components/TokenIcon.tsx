@@ -22,8 +22,20 @@ const SPEC: Record<Exclude<TokenKind, "qova">, Spec> = {
   ars: { sym: "$", v: "light", f: 0.42 }, ghs: { sym: "₵", v: "light", f: 0.42 }, mxn: { sym: "$", v: "light", f: 0.42 },
 };
 
+/** Official artwork supplied by the owner for these tokens. */
+const IMG: Partial<Record<TokenKind, string>> = { sol: "/tokens/sol.webp", doge: "/tokens/doge.webp", usdc: "/tokens/usdc.webp" };
+
 export default function TokenIcon({ kind, size = 40, className }: { kind: TokenKind; size?: number; className?: string }) {
   const cls = `tk${className ? ` ${className}` : ""}`;
+  const img = IMG[kind];
+  if (img) {
+    return (
+      <span className={`${cls} tk-img`} style={{ width: size, height: size }} aria-hidden="true">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={img} alt="" width={size} height={size} loading="eager" decoding="async" draggable={false} />
+      </span>
+    );
+  }
   if (kind === "qova") {
     return (
       <span className={`${cls} tk-dark`} style={{ width: size, height: size }} aria-hidden="true">

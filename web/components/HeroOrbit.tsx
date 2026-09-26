@@ -3,8 +3,8 @@ import { useEffect, useRef } from "react";
 import TokenIcon, { type TokenKind } from "./TokenIcon";
 
 const ORBIT: { k: TokenKind; s: number }[] = [
-  { k: "sol", s: 60 }, { k: "bonk", s: 46 }, { k: "usdc", s: 56 }, { k: "wif", s: 44 }, { k: "btc", s: 48 },
-  { k: "popcat", s: 46 }, { k: "doge", s: 50 }, { k: "eth", s: 44 }, { k: "jup", s: 42 },
+  { k: "sol", s: 62 }, { k: "bonk", s: 44 }, { k: "usdc", s: 58 }, { k: "doge", s: 50 },
+  { k: "wif", s: 42 }, { k: "btc", s: 46 }, { k: "jup", s: 40 }, { k: "eth", s: 44 },
 ];
 
 /** Glossy tokens orbiting the coin on a tilted ellipse, passing behind and in front of it. */
@@ -18,15 +18,15 @@ export default function HeroOrbit() {
     let raf = 0, t = 0.4, visible = true, last = performance.now();
     const place = () => {
       const w = root.clientWidth, h = root.clientHeight;
-      const rx = w * 0.47, ry = h * 0.22;
+      const rx = w * 0.44, ry = h * 0.3;
       items.forEach((el, k) => {
         const a = t + (k / items.length) * Math.PI * 2;
         const x = Math.cos(a) * rx, y = Math.sin(a) * ry - x * 0.12;
         const depth = (Math.sin(a) + 1) / 2;
-        const sc = 0.7 + depth * 0.45;
+        const sc = 0.82 + depth * 0.3;
         el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${sc.toFixed(3)})`;
-        el.style.zIndex = depth > 0.5 ? "3" : "1";
-        el.style.opacity = (0.82 + depth * 0.18).toFixed(2);
+        el.style.zIndex = String(10 + Math.round(depth * 10));
+        el.style.opacity = "1";
       });
     };
     const loop = (now: number) => {
