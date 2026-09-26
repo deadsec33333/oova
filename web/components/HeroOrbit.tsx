@@ -2,9 +2,12 @@
 import { useEffect, useRef } from "react";
 import TokenIcon, { type TokenKind } from "./TokenIcon";
 
-const ORBIT: TokenKind[] = ["usdc", "sol", "ngn", "php", "brl", "kes", "usdc", "idr"];
+const ORBIT: { k: TokenKind; s: number }[] = [
+  { k: "usdc", s: 56 }, { k: "ngn", s: 42 }, { k: "sol", s: 50 }, { k: "php", s: 40 }, { k: "usdc", s: 46 },
+  { k: "brl", s: 42 }, { k: "qova", s: 48 }, { k: "kes", s: 40 }, { k: "idr", s: 40 },
+];
 
-/** Tokens orbiting the coin on a tilted ellipse, passing behind and in front of it. */
+/** Glossy tokens orbiting the coin on a tilted ellipse, passing behind and in front of it. */
 export default function HeroOrbit() {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -12,25 +15,23 @@ export default function HeroOrbit() {
     if (!root) return;
     const items = Array.from(root.querySelectorAll<HTMLElement>(".orb"));
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let raf = 0, t = 0, visible = true, last = performance.now();
+    let raf = 0, t = 0.4, visible = true, last = performance.now();
     const place = () => {
       const w = root.clientWidth, h = root.clientHeight;
-      const rx = w * 0.46, ry = h * 0.2, tilt = -0.2;
+      const rx = w * 0.47, ry = h * 0.22;
       items.forEach((el, k) => {
         const a = t + (k / items.length) * Math.PI * 2;
-        const x = Math.cos(a) * rx, y0 = Math.sin(a) * ry;
-        const y = y0 + x * Math.sin(tilt) * 0.5;
+        const x = Math.cos(a) * rx, y = Math.sin(a) * ry - x * 0.12;
         const depth = (Math.sin(a) + 1) / 2;
-        const sc = 0.62 + depth * 0.48;
+        const sc = 0.7 + depth * 0.45;
         el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${sc.toFixed(3)})`;
         el.style.zIndex = depth > 0.5 ? "3" : "1";
-        el.style.opacity = (0.45 + depth * 0.55).toFixed(2);
-        el.style.filter = depth < 0.35 ? `blur(${((0.35 - depth) * 4).toFixed(1)}px)` : "none";
+        el.style.opacity = (0.82 + depth * 0.18).toFixed(2);
       });
     };
     const loop = (now: number) => {
       const dt = Math.min(64, now - last); last = now;
-      t += dt * 0.00022;
+      t += dt * 0.00018;
       place();
       if (visible) raf = requestAnimationFrame(loop);
     };
@@ -42,8 +43,10 @@ export default function HeroOrbit() {
   }, []);
   return (
     <div ref={ref} className="orbit-field" aria-hidden="true">
-      {ORBIT.map((k, i) => (
-        <div key={i} className="orb"><TokenIcon kind={k} size={44} /></div>
+      {ORBIT.map((o, i) => (
+        <div key={i} className="orb" style={{ width: o.s, height: o.s, margin: `${-o.s / 2}px 0 0 ${-o.s / 2}px` }}>
+          <div className="orb-in" style={{ animationDelay: `${-i * 0.7}s` }}><TokenIcon kind={o.k} size={o.s} /></div>
+        </div>
       ))}
     </div>
   );

@@ -34,7 +34,9 @@ export default function Story() {
     const tags = Array.from(root.querySelectorAll<HTMLElement>(".st-tag"));
     let cur = -1;
     const setStep = (i: number) => {
-      if (i === cur) return; cur = i;
+      if (i === cur) return;
+      if (cur !== -1) window.dispatchEvent(new CustomEvent("qova:step", { detail: i }));
+      cur = i;
       steps.forEach((s, n) => { s.classList.toggle("is-on", n === i); s.classList.toggle("is-done", n < i); });
       tags.forEach((s, n) => s.classList.toggle("is-on", n === i));
     };
@@ -65,6 +67,7 @@ export default function Story() {
         TYPE.forEach((k, i) => {
           const at = 0.25 + i * 0.3;
           const key = keyEl(k);
+          tl.call(() => { window.dispatchEvent(new Event("qova:key")); }, [], at);
           if (key) tl.to(key, { backgroundColor: "#0A0A0A", color: "#fff", scale: 0.9, duration: 0.12, yoyo: true, repeat: 1, ease: "power1.inOut" }, at);
           tl.to(digits[i], { yPercent: 0, opacity: 1, maxWidth: "0.75em", duration: 0.2, ease: "back.out(2)" }, at + 0.05);
         });

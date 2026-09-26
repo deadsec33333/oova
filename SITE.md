@@ -69,3 +69,10 @@ A daylight fintech console. Mix of two references Aurimas picked: Stockcoin (chr
 - Nav turns into dark glass when it sits over a dark section; the scroll line under the nav is gone.
 - Dark sections and the footer are now rounded floating panels with side margins.
 - Globe glow no longer clipped (the hard rectangle is gone), soft round mask, arcs stay inside.
+
+## v4: black edition, 3D coin, glossy tokens, sound (26 Sep 2026)
+- Theme button in the nav: white or black edition, circle reveal from the button (View Transitions), remembered per browser, no flash on load.
+- Hero coin rebuilt as a real 3D chrome coin: embossed QOVA mark on both faces, milled edge from 14 stacked layers, slow sway, pointer tilt, flip when a link is made.
+- Orbit tokens are glossy, larger, never faded or blurred, pop in on load and bob.
+- Sound design, all synthesised with Web Audio (no files), off by default: hover ticks, taps, keypad clicks in the story, whoosh per story step, a cash ping when the payment arrives, a chime when a link is made, a swoosh on theme change, and a quiet breathing pad. The floating sound button is a live equalizer driven by the real audio output; one click turns everything off.
+- Scrolling currency rail removed. USDC labels next to big numbers no longer squished.

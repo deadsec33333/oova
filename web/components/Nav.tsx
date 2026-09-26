@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Logo from "./Logo";
+import ThemeToggle from "./ThemeToggle";
 import Btn from "./Btn";
 
 const LINKS = [
@@ -18,11 +19,12 @@ export default function Nav() {
     const read = () => {
       setScrolled(window.scrollY > 24);
       const y = 38;
-      setDark(Array.from(document.querySelectorAll(".band, .foot")).some((el) => { const r = el.getBoundingClientRect(); return r.top <= y && r.bottom >= y; }));
+      setDark(document.documentElement.dataset.theme === "dark" || Array.from(document.querySelectorAll(".band, .foot")).some((el) => { const r = el.getBoundingClientRect(); return r.top <= y && r.bottom >= y; }));
     };
     read();
     window.addEventListener("scroll", read, { passive: true });
-    return () => window.removeEventListener("scroll", read);
+    window.addEventListener("qova:theme", read);
+    return () => { window.removeEventListener("scroll", read); window.removeEventListener("qova:theme", read); };
   }, []);
 
   useEffect(() => {
@@ -50,6 +52,7 @@ export default function Nav() {
             {LINKS.map(([t, h]) => <a key={h} href={h} onClick={go(h)}><span data-text={t}><span>{t}</span></span></a>)}
           </nav>
           <div className="nav-right">
+            <ThemeToggle />
             <Btn href="#make" size="sm" className="nav-cta">Make a link</Btn>
             <button className="burger" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
               <i /><i />

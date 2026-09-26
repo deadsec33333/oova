@@ -1,6 +1,7 @@
 import { Equal, Globe, Lock, QrCode, Share2, UserX, Wallet, Zap, Briefcase, House, Store, Palette } from "lucide-react";
 import Coin from "@/components/Coin";
 import Nav from "@/components/Nav";
+import SoundToggle from "@/components/SoundToggle";
 import Logo from "@/components/Logo";
 import Btn from "@/components/Btn";
 import HeroOrbit from "@/components/HeroOrbit";
@@ -37,6 +38,7 @@ export default function Home() {
       <Loader />
       <Motion />
       <Nav />
+      <SoundToggle />
 
       <main id="top">
         {/* HERO */}
@@ -59,7 +61,7 @@ export default function Home() {
             <div className="hero-visual" data-intro>
               <div className="orbit" aria-hidden="true" />
               <HeroOrbit />
-              <Coin size={210} />
+              <Coin size={220} />
               <div className="chip chip-a" aria-hidden="true">
                 <TokenIcon kind="usdc" size={30} />
                 <span><small className="mono">Link made · sample</small><b>25.00 USDC</b></span>
@@ -90,7 +92,7 @@ export default function Home() {
               <div className="card-ico"><Equal size={20} /></div>
               <h3>The exact amount</h3>
               <p>You ask for 25.00, you get 25.00. The payer covers the tiny network fee.</p>
-              <div className="mini mini-amount mono" aria-hidden="true"><span>25</span><span className="mini-dot">.</span><span className="mini-roll"><span>00</span><span>00</span></span><small>USDC</small></div>
+              <div className="mini mini-amount" aria-hidden="true"><span>25</span><span className="mini-dot">.</span><span className="mini-roll"><span>00</span><span>00</span></span><small>USDC</small></div>
             </article>
             <article className="card" data-tilt data-fade>
               <div className="card-ico"><QrCode size={20} /></div>

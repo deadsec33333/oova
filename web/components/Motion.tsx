@@ -36,7 +36,7 @@ export default function Motion() {
         .from(".hero .lead", { y: 24, opacity: 0, duration: 1.1 }, 0.35)
         .from(".hero .cta-row > *", { y: 20, opacity: 0, duration: 0.9, stagger: 0.08 }, 0.45)
         .from(".hero .coin-stage", { scale: 0.55, rotate: -40, opacity: 0, duration: 1.6 }, 0.2)
-        .from(".hero .orbit-field", { opacity: 0, scale: 0.8, duration: 1.4 }, 0.5)
+        .from(".hero .orb-in", { scale: 0, opacity: 0, duration: 0.9, stagger: 0.07, ease: "back.out(2.2)" }, 0.55)
         .from(".hero .chip", { y: 20, scale: 0.9, opacity: 0, duration: 0.9, stagger: 0.12, ease: "back.out(1.6)" }, 0.8);
       const go = () => intro.play();
       window.addEventListener("qova:ready", go, { once: true });
