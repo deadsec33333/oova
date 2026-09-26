@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Logo from "./Logo";
 import Btn from "./Btn";
 
 const LINKS = [
@@ -11,12 +12,13 @@ type L = { stop: () => void; start: () => void; scrollTo: (t: string, o?: object
 export default function Nav() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [p, setP] = useState(0);
+  const [dark, setDark] = useState(false);
 
   useEffect(() => {
     const read = () => {
-      const y = window.scrollY, max = document.documentElement.scrollHeight - window.innerHeight;
-      setScrolled(y > 24); setP(max > 0 ? Math.min(1, y / max) : 0);
+      setScrolled(window.scrollY > 24);
+      const y = 38;
+      setDark(Array.from(document.querySelectorAll(".band, .foot")).some((el) => { const r = el.getBoundingClientRect(); return r.top <= y && r.bottom >= y; }));
     };
     read();
     window.addEventListener("scroll", read, { passive: true });
@@ -39,11 +41,10 @@ export default function Nav() {
 
   return (
     <>
-      <header className={`nav${scrolled ? " is-scrolled" : ""}${open ? " is-open" : ""}`}>
+      <header className={`nav${scrolled ? " is-scrolled" : ""}${dark ? " is-dark" : ""}${open ? " is-open" : ""}`}>
         <div className="nav-pill">
           <a href="#top" className="brand" aria-label="QOVA home" onClick={go("#top")}>
-            <span className="brand-mark" aria-hidden="true" />
-            <span className="brand-word">QOVA</span>
+            <Logo />
           </a>
           <nav className="nav-links" aria-label="Sections">
             {LINKS.map(([t, h]) => <a key={h} href={h} onClick={go(h)}><span data-text={t}><span>{t}</span></span></a>)}
@@ -54,7 +55,6 @@ export default function Nav() {
               <i /><i />
             </button>
           </div>
-          <span className="nav-progress" style={{ transform: `scaleX(${p})` }} aria-hidden="true" />
         </div>
       </header>
       <div className={`menu${open ? " is-open" : ""}`} aria-hidden={!open}>

@@ -20,10 +20,8 @@ export default function Loader() {
   if (state === "gone") return null;
   return (
     <div className={state === "leave" ? "loader is-leaving" : "loader"} aria-hidden="true">
-      <svg viewBox="0 0 120 120" className="loader-q">
-        <defs><linearGradient id="lq" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#fff" /><stop offset=".5" stopColor="#b9c1ca" /><stop offset="1" stopColor="#6d7682" /></linearGradient></defs>
-        <circle className="lq-ring" cx="56" cy="56" r="36" fill="none" stroke="url(#lq)" strokeWidth="12" strokeLinecap="round" />
-        <path className="lq-tail" d="M78 78 L100 100" stroke="#fff" strokeWidth="12" strokeLinecap="round" />
+      <svg viewBox="4 4 40 40" className="loader-q">
+        <path className="lq-draw" pathLength={1} d="M38 35.81 L38 22 A16 16 0 1 0 22 38 L35.81 38 L26.165 28.357 A7.6 7.6 0 1 1 28.357 26.165 Z" />
       </svg>
       <div className="loader-word">QOVA</div>
     </div>

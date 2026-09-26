@@ -32,6 +32,9 @@ Main audience: people in Africa, Latin America and Southeast Asia who want stabl
 - **States:** idle (slow shine), made (flip), paid (mint glow), asleep (dim, when the tab is hidden).
 - **WOW test:** a circle with a tail. Reads in one second, works at 64 px, a kid draws it in two strokes.
 
+## Logo
+The mark is a coin shaped like a chat bubble, cut by the tail of a Q. Coin plus message: a payment request you send like a text. One path, black or white only. Files in `brand/` (SVG marks, app icon, PFP, X banner, wordmark). Wordmark: QOVA in Geist SemiBold, tracking 0.24em.
+
 ## World
 A daylight fintech console. White space, a soft sky and mint gradient, thin lines that carry money from box to box, one dark band where the real tool lives, and a halftone dot globe. Luxury by restraint.
 

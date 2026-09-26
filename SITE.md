@@ -63,3 +63,9 @@ A daylight fintech console. Mix of two references Aurimas picked: Stockcoin (chr
 - Buttons: pill buttons with a rolling label on hover, an arrow chip that swaps arrows, a soft sheen, magnetic pull on desktop.
 - Scroll motion calmed down: Lenis lerp 0.09, headings rise line by line out of a mask (no blur), blocks fade up once.
 - Story rebuilt: realistic phone (status bar, island, side buttons, glare, 3D tilt across the scroll), keypad typing 2 5 . 0 0, share sheet, chat with typing dots and link preview, confirm payment with slide to pay and face scan, notification banner, drawn check ring, count up, sparks and receipt. Progress rail and icon steps on desktop, floating tags per step.
+
+## v3.1: logo and floating panels (26 Sep 2026)
+- New mark: a coin shaped like a chat bubble, cut by the tail of a Q (the payment request is a message). One path, works from 16 px to billboard. Files in `brand/`: black and white SVG marks, app icon, PFP 400 and 1024, X banner 1500x500, wordmark.
+- Nav turns into dark glass when it sits over a dark section; the scroll line under the nav is gone.
+- Dark sections and the footer are now rounded floating panels with side margins.
+- Globe glow no longer clipped (the hard rectangle is gone), soft round mask, arcs stay inside.

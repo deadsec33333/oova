@@ -61,17 +61,18 @@ export default function WorldGlobe({ className }: { className?: string }) {
       if (canvas.width !== Math.round(w * dpr)) { canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
-      const R = Math.min(w, h) * 0.44, cx = w / 2, cy = h / 2;
+      const R = Math.min(w, h) * 0.36, cx = w / 2, cy = h / 2;
       // atmosphere
-      const grd = ctx.createRadialGradient(cx, cy, R * 0.9, cx, cy, R * 1.25);
-      grd.addColorStop(0, "rgba(255,255,255,0.07)"); grd.addColorStop(1, "rgba(255,255,255,0)");
-      ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(cx, cy, R * 1.25, 0, Math.PI * 2); ctx.fill();
+      const halo = Math.min(w, h) * 0.5;
+      const grd = ctx.createRadialGradient(cx, cy, R * 0.85, cx, cy, halo);
+      grd.addColorStop(0, "rgba(255,255,255,0.035)"); grd.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(cx, cy, halo, 0, Math.PI * 2); ctx.fill();
       for (const p of pts) {
         const [x, y, z] = project(p);
         if (z < -0.05) continue;
         const d = (z + 1) / 2;
-        ctx.globalAlpha = 0.1 + d * 0.55;
-        ctx.fillStyle = "#8a8a8a";
+        ctx.globalAlpha = 0.16 + d * 0.64;
+        ctx.fillStyle = "#a3a3a3";
         ctx.fillRect(cx + x * R, cy + y * R, 0.7 + d * 1.3, 0.7 + d * 1.3);
       }
       // arcs
@@ -83,7 +84,7 @@ export default function WorldGlobe({ className }: { className?: string }) {
         for (let k = 0; k <= 40; k++) {
           const tt = tail + (head - tail) * (k / 40);
           const v = slerp(A, B, tt);
-          const lift = 1 + 0.28 * Math.sin(Math.PI * tt);
+          const lift = 1 + 0.2 * Math.sin(Math.PI * tt);
           const [x, y, z] = project([v[0] * lift, v[1] * lift, v[2] * lift]);
           if (prev && z > -0.2 && prev[2] > -0.2) {
             ctx.globalAlpha = 0.25 + 0.75 * (k / 40);

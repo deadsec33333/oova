@@ -1,6 +1,7 @@
 import { Equal, Globe, Lock, QrCode, Share2, UserX, Wallet, Zap, Briefcase, House, Store, Palette } from "lucide-react";
 import Coin from "@/components/Coin";
 import Nav from "@/components/Nav";
+import Logo from "@/components/Logo";
 import Btn from "@/components/Btn";
 import HeroOrbit from "@/components/HeroOrbit";
 import WordRotator from "@/components/WordRotator";
@@ -257,7 +258,7 @@ export default function Home() {
       <footer className="foot">
         <div className="wrap">
           <div className="foot-top">
-            <span className="brand"><span className="brand-mark" aria-hidden="true" /><span className="brand-word">QOVA</span></span>
+            <span className="brand"><Logo /></span>
             <Btn href="#make" variant="light" size="sm">Make a link</Btn>
           </div>
           <p className="disclaimer">$QOVA is a memecoin with no intrinsic value and no expectation of profit. It is not a dollar or a stablecoin and its price can go to zero. QOVA pay links are a free, non custodial demo: payments go straight between wallets and QOVA never holds, moves or converts money. USDC is issued by Circle, not by QOVA. Check the rules where you live. Not financial advice.</p>

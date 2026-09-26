@@ -1,3 +1,4 @@
+import { MARK_D } from "./Logo";
 /** Original monochrome token and currency badges (not official logos). */
 export type TokenKind = "usdc" | "sol" | "ngn" | "php" | "brl" | "kes" | "idr" | "pen" | "ars" | "ghs" | "mxn" | "qova";
 
@@ -25,10 +26,8 @@ export default function TokenIcon({ kind, size = 40, className }: { kind: TokenK
   if (kind === "qova") {
     return (
       <svg className={className} width={s} height={s} viewBox="0 0 40 40" aria-hidden="true">
-        <defs><linearGradient id="tkq" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#fff" /><stop offset=".5" stopColor="#bdbdbd" /><stop offset="1" stopColor="#6e6e6e" /></linearGradient></defs>
         <circle cx="20" cy="20" r="19.5" fill="#0A0A0A" />
-        <circle cx="19" cy="19" r="9" fill="none" stroke="url(#tkq)" strokeWidth="4" />
-        <path d="M24.5 24.5 L30 30" stroke="#fff" strokeWidth="4" strokeLinecap="round" />
+        <g transform="translate(8.5 8.5) scale(0.64)"><path d={MARK_D} transform="translate(-4 -4)" fill="#fff" /></g>
       </svg>
     );
   }

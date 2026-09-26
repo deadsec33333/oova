@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import QR from "@/components/QR";
 import CopyButton from "@/components/CopyButton";
 import Coin from "@/components/Coin";
+import Logo from "@/components/Logo";
 import { cleanText, displayAmount, isSolanaAddress, parseAmount, solanaPayUrl, shortAddress } from "@/lib/solanapay";
 
 type SP = Promise<Record<string, string | string[] | undefined>>;
@@ -29,7 +30,7 @@ export default async function Pay({ searchParams }: { searchParams: SP }) {
     return (
       <main className="pay">
         <div className="pay-card">
-          <a href="/" className="brand"><span className="brand-mark" aria-hidden="true" /><span className="brand-word">QOVA</span></a>
+          <a href="/" className="brand"><Logo /></a>
           <h1 className="h2">This link is broken.</h1>
           <p className="lead">The address or the amount is missing or wrong. Ask the person for a new link.</p>
           <a href="/#make" className="btn btn-chrome btn-wide">Make your own link</a>
@@ -44,7 +45,7 @@ export default async function Pay({ searchParams }: { searchParams: SP }) {
     <main className="pay">
       <div className="pay-sky" aria-hidden="true" />
       <div className="pay-card">
-        <a href="/" className="brand"><span className="brand-mark" aria-hidden="true" /><span className="brand-word">QOVA</span></a>
+        <a href="/" className="brand"><Logo /></a>
         <div className="pay-coin"><Coin size={96} /></div>
         <p className="kicker mono"><span className="sq" />Pay request</p>
         <h1 className="pay-amount">{displayAmount(amount!)} <small>USDC</small></h1>
