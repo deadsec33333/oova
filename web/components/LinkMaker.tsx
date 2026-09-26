@@ -2,6 +2,7 @@
 import { useState } from "react";
 import QR from "./QR";
 import CopyButton from "./CopyButton";
+import PayStatus from "./PayStatus";
 import { cleanText, displayAmount, isSolanaAddress, newReference, parseAmount, payPageUrl, solanaPayUrl, type PayRequest } from "@/lib/solanapay";
 
 type Result = { req: PayRequest; page: string; wallet: string };
@@ -68,6 +69,7 @@ export default function LinkMaker() {
               <span className="out-amount">{displayAmount(result.req.amount)} <small>USDC</small></span>
             </div>
             <QR value={result.wallet} label="QR code: scan with a Solana wallet to pay" />
+            {result.req.ref && <PayStatus to={result.req.to} amount={result.req.amount} refKey={result.req.ref} dark />}
             <p className="fine center">Scan with Phantom, Solflare or any Solana wallet to pay now.</p>
             <div className="linkbox mono">{result.page}</div>
             <div className="out-actions">

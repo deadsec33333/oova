@@ -1065,3 +1065,19 @@ html[data-theme="dark"] .trust2 { background: radial-gradient(120% 70% at 50% 0%
   .orbit-field { height: 390px; }
   .chip-a { top: 0; } .chip-b { bottom: 0; }
 }
+
+/* live payment status */
+.pst { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 16px; background: var(--mist); box-shadow: inset 0 0 0 1px var(--line); text-align: left; }
+.pst div { flex: 1; display: grid; line-height: 1.3; min-width: 0; }
+.pst b { font-weight: 500; font-size: 14px; }
+.pst .mono { font-size: 9.5px; color: var(--slate); }
+.pst-dot { position: relative; flex: none; width: 10px; height: 10px; margin: 0 4px; border-radius: 50%; background: var(--ink); }
+.pst-dot::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 1.5px solid var(--ink); animation: pstPing 1.6s ease-out infinite; }
+@keyframes pstPing { from { transform: scale(.4); opacity: 1; } to { transform: scale(1.4); opacity: 0; } }
+.pst.is-paid { background: #0a0a0a; color: #fff; box-shadow: 0 20px 40px -24px rgba(0,0,0,.6); animation: secIn .6s var(--ease) both; }
+.pst.is-paid .mono { color: #9a9a9a; }
+.pst-ico { flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: #fff; color: #0a0a0a; }
+.pst a { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 0 12px; border-radius: 999px; background: #fff; color: #0a0a0a; font-size: 12.5px; font-weight: 500; white-space: nowrap; }
+.pst.is-dark { background: #0c0c0c; box-shadow: inset 0 0 0 1px #262626; color: #fff; }
+.pst.is-dark .pst-dot { background: #fff; } .pst.is-dark .pst-dot::after { border-color: #fff; }
+.pst.is-dark.is-paid { background: #fff; color: #0a0a0a; } .pst.is-dark.is-paid .pst-ico { background: #0a0a0a; color: #fff; } .pst.is-dark.is-paid a { background: #0a0a0a; color: #fff; } .pst.is-dark.is-paid .mono { color: #6b6b6b; }

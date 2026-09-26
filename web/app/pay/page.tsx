@@ -3,6 +3,7 @@ import QR from "@/components/QR";
 import CopyButton from "@/components/CopyButton";
 import Coin from "@/components/Coin";
 import Logo from "@/components/Logo";
+import PayStatus from "@/components/PayStatus";
 import { cleanText, displayAmount, isSolanaAddress, parseAmount, solanaPayUrl, shortAddress } from "@/lib/solanapay";
 
 type SP = Promise<Record<string, string | string[] | undefined>>;
@@ -53,6 +54,7 @@ export default async function Pay({ searchParams }: { searchParams: SP }) {
         {label && <p className="pay-note">Name set by the person who made this link.</p>}
         {message && <p className="pay-msg">“{message}”</p>}
 
+        {ref && <PayStatus to={to} amount={amount!} refKey={ref} />}
         <a href={wallet} className="btn btn-chrome btn-wide">Pay with a Solana wallet</a>
         <p className="fine center">On a computer? Scan this with your phone wallet.</p>
         <QR value={wallet} label="QR code for this payment" />

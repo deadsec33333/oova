@@ -99,3 +99,9 @@ A daylight fintech console. Mix of two references Aurimas picked: Stockcoin (chr
 - WIF, BONK, BTC and ETH now use the official artwork Aurimas supplied too (all 7 orbit coins are official art except JUP).
 - The orbit is computed from the big coin's size, so small coins never cross or cover it.
 - The big coin is now minted: engraved rim text ("QOVA · DOLLARS FOR EVERYONE · ONE LINK AWAY · WALLET TO WALLET"), a dotted ring, a slowly turning guilloché rosette like banknote security print, a raised bevelled mark and a soft holographic sheen, on both faces.
+
+## Backend 1: live payment detection (27 Sep 2026)
+- `SOLANA_RPC` (Helius) set by Aurimas in Vercel. Server only, never sent to the browser (`lib/rpc.ts` imports `server-only`).
+- `GET /api/pay/status?to&amount&ref`: finds transactions that include the link's random reference key, then checks the receiver's USDC balance rose by at least the amount in a successful transaction. Read only.
+- Pay page and link maker poll it every 3 s (10 s after 10 minutes, only while the tab is visible) and flip to "Paid" with a Solscan receipt link, a chime and the coin flip.
+- `GET /api/health`: which keys exist and whether the RPC answers. Booleans only.
