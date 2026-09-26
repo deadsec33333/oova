@@ -23,7 +23,7 @@ export default function Loader() {
       <svg viewBox="0 0 120 120" className="loader-q">
         <defs><linearGradient id="lq" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#fff" /><stop offset=".5" stopColor="#b9c1ca" /><stop offset="1" stopColor="#6d7682" /></linearGradient></defs>
         <circle className="lq-ring" cx="56" cy="56" r="36" fill="none" stroke="url(#lq)" strokeWidth="12" strokeLinecap="round" />
-        <path className="lq-tail" d="M78 78 L100 100" stroke="#19C39B" strokeWidth="12" strokeLinecap="round" />
+        <path className="lq-tail" d="M78 78 L100 100" stroke="#fff" strokeWidth="12" strokeLinecap="round" />
       </svg>
       <div className="loader-word">QOVA</div>
     </div>

@@ -18,7 +18,7 @@ export default function Motion() {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) { root.classList.add("reduce"); window.dispatchEvent(new Event("qova:motion")); return; }
 
-    const lenis = new Lenis({ duration: 1.15, smoothWheel: true, anchors: { offset: -72 } });
+    const lenis = new Lenis({ lerp: 0.09, smoothWheel: true, wheelMultiplier: 0.9, anchors: { offset: -84 } });
     (window as unknown as { __lenis?: Lenis }).__lenis = lenis;
     lenis.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => lenis.raf(time * 1000);
@@ -33,7 +33,7 @@ export default function Motion() {
       intro
         .to("[data-intro]", { opacity: 1, duration: 0.01 }, 0)
         .from(".hero .kicker", { y: 16, opacity: 0, duration: 0.8 }, 0)
-        .from(".hero .lead", { y: 24, opacity: 0, filter: "blur(6px)", duration: 1 }, 0.35)
+        .from(".hero .lead", { y: 24, opacity: 0, duration: 1.1 }, 0.35)
         .from(".hero .cta-row > *", { y: 20, opacity: 0, duration: 0.9, stagger: 0.08 }, 0.45)
         .from(".hero .coin-stage", { scale: 0.55, rotate: -40, opacity: 0, duration: 1.6 }, 0.2)
         .from(".hero .orbit-field", { opacity: 0, scale: 0.8, duration: 1.4 }, 0.5)
@@ -42,29 +42,23 @@ export default function Motion() {
       window.addEventListener("qova:ready", go, { once: true });
       if ((window as unknown as { __qovaReady?: boolean }).__qovaReady) go();
 
-      // headings: words rise out of a mask, reverse when you scroll back above them
+      // headings: lines rise out of a mask; they tuck back down if you scroll above them
       gsap.utils.toArray<HTMLElement>("[data-split]").forEach((el) => {
         SplitText.create(el, {
-          type: "words,lines", mask: "lines", linesClass: "sl", autoSplit: true,
-          onSplit: (s) => gsap.from(s.words, {
-            yPercent: 110, opacity: 0, duration: 1.1, ease: "expo.out", stagger: 0.045,
+          type: "lines", mask: "lines", linesClass: "sl", autoSplit: true,
+          onSplit: (s) => gsap.from(s.lines, {
+            yPercent: 105, duration: 1.25, ease: "expo.out", stagger: 0.09,
             scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none reverse" },
           }),
         });
       });
 
-      // blocks: fade up, disappear again when scrolled back past
+      // blocks: soft rise, once
       gsap.utils.toArray<HTMLElement>("[data-fade]").forEach((el) => {
-        gsap.from(el, {
-          y: 40, opacity: 0, filter: "blur(8px)", duration: 1.1, ease: "power3.out",
-          scrollTrigger: { trigger: el, start: "top 90%", toggleActions: "play none none reverse" },
-        });
+        gsap.from(el, { y: 28, opacity: 0, duration: 1.1, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 90%", once: true } });
       });
       gsap.utils.toArray<HTMLElement>("[data-stagger]").forEach((el) => {
-        gsap.from(el.children, {
-          y: 34, opacity: 0, duration: 0.9, ease: "power3.out", stagger: 0.08,
-          scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none reverse" },
-        });
+        gsap.from(el.children, { y: 24, opacity: 0, duration: 0.9, ease: "power3.out", stagger: 0.07, scrollTrigger: { trigger: el, start: "top 90%", once: true } });
       });
 
       // lore: words light up as you scroll through
@@ -87,16 +81,6 @@ export default function Motion() {
       // big footer word
       gsap.from(".foot-word", { yPercent: 40, opacity: 0, ease: "power2.out", scrollTrigger: { trigger: ".foot", start: "top 95%", end: "bottom bottom", scrub: true } });
 
-      // progress bar and nav
-      gsap.to(".progress", { scaleX: 1, ease: "none", scrollTrigger: { start: 0, end: "max", scrub: 0.3 } });
-      const nav = document.querySelector(".nav");
-      ScrollTrigger.create({
-        start: 0, end: "max",
-        onUpdate: (self) => {
-          nav?.classList.toggle("nav-hidden", self.direction === 1 && self.scroll() > 240);
-          nav?.classList.toggle("nav-solid", self.scroll() > 20);
-        },
-      });
     });
 
     // pointer toys (desktop only)

@@ -64,14 +64,14 @@ export default function WorldGlobe({ className }: { className?: string }) {
       const R = Math.min(w, h) * 0.44, cx = w / 2, cy = h / 2;
       // atmosphere
       const grd = ctx.createRadialGradient(cx, cy, R * 0.9, cx, cy, R * 1.25);
-      grd.addColorStop(0, "rgba(25,195,155,0.10)"); grd.addColorStop(1, "rgba(25,195,155,0)");
+      grd.addColorStop(0, "rgba(255,255,255,0.07)"); grd.addColorStop(1, "rgba(255,255,255,0)");
       ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(cx, cy, R * 1.25, 0, Math.PI * 2); ctx.fill();
       for (const p of pts) {
         const [x, y, z] = project(p);
         if (z < -0.05) continue;
         const d = (z + 1) / 2;
         ctx.globalAlpha = 0.1 + d * 0.55;
-        ctx.fillStyle = "#8f9bab";
+        ctx.fillStyle = "#8a8a8a";
         ctx.fillRect(cx + x * R, cy + y * R, 0.7 + d * 1.3, 0.7 + d * 1.3);
       }
       // arcs
@@ -87,13 +87,13 @@ export default function WorldGlobe({ className }: { className?: string }) {
           const [x, y, z] = project([v[0] * lift, v[1] * lift, v[2] * lift]);
           if (prev && z > -0.2 && prev[2] > -0.2) {
             ctx.globalAlpha = 0.25 + 0.75 * (k / 40);
-            ctx.strokeStyle = "#19C39B";
+            ctx.strokeStyle = "#ffffff";
             ctx.beginPath(); ctx.moveTo(cx + prev[0] * R, cy + prev[1] * R); ctx.lineTo(cx + x * R, cy + y * R); ctx.stroke();
           }
           prev = [x, y, z];
         }
         if (prev && prev[2] > -0.2 && head < 1) {
-          ctx.globalAlpha = 1; ctx.fillStyle = "#b8ffe9";
+          ctx.globalAlpha = 1; ctx.fillStyle = "#ffffff";
           ctx.beginPath(); ctx.arc(cx + prev[0] * R, cy + prev[1] * R, 2.6, 0, Math.PI * 2); ctx.fill();
         }
       }
@@ -105,7 +105,7 @@ export default function WorldGlobe({ className }: { className?: string }) {
         ctx.globalAlpha = Math.min(1, z * 2);
         ctx.fillStyle = "#ffffff";
         ctx.beginPath(); ctx.arc(cx + x * R, cy + y * R, 2.4, 0, Math.PI * 2); ctx.fill();
-        if (z > 0.35 && w > 360) { ctx.fillStyle = "#c9d3dd"; ctx.fillText(c.n.toUpperCase(), cx + x * R + 6, cy + y * R + 3); }
+        if (z > 0.35 && w > 360) { ctx.fillStyle = "#bdbdbd"; ctx.fillText(c.n.toUpperCase(), cx + x * R + 6, cy + y * R + 3); }
       }
       ctx.globalAlpha = 1;
     };

@@ -1,5 +1,7 @@
-import { ArrowUpRight, Equal, Globe, Lock, QrCode, Share2, UserX, Wallet, Zap, Briefcase, House, Store, Palette } from "lucide-react";
+import { Equal, Globe, Lock, QrCode, Share2, UserX, Wallet, Zap, Briefcase, House, Store, Palette } from "lucide-react";
 import Coin from "@/components/Coin";
+import Nav from "@/components/Nav";
+import Btn from "@/components/Btn";
 import HeroOrbit from "@/components/HeroOrbit";
 import WordRotator from "@/components/WordRotator";
 import Loader from "@/components/Loader";
@@ -37,21 +39,7 @@ export default function Home() {
     <>
       <Loader />
       <Motion />
-      <div className="progress" aria-hidden="true" />
-      <header className="nav">
-        <a href="#top" className="brand" aria-label="QOVA home">
-          <span className="brand-mark" aria-hidden="true" />
-          <span className="brand-word">QOVA</span>
-        </a>
-        <nav className="nav-links" aria-label="Sections">
-          <a href="#how">How it works</a>
-          <a href="#world">Worldwide</a>
-          <a href="#make">Pay link</a>
-          <a href="#coin">$QOVA</a>
-          <a href="#faq">FAQ</a>
-        </nav>
-        <a href="#make" className="btn btn-chrome btn-sm" data-magnetic>Make a link</a>
-      </header>
+      <Nav />
 
       <main id="top">
         {/* HERO */}
@@ -67,8 +55,8 @@ export default function Home() {
             </h1>
             <p className="lead" data-intro>Send a link. Anyone pays it. You get the exact amount in digital dollars, straight to your wallet.</p>
             <div className="cta-row" data-intro>
-              <a href="#make" className="btn btn-chrome btn-lg" data-magnetic>Make your pay link <ArrowUpRight size={18} /></a>
-              <a href="#how" className="btn btn-ghost">Watch how it works <span aria-hidden="true">→</span></a>
+              <Btn href="#make" size="lg">Make your pay link</Btn>
+              <Btn href="#how" variant="outline" size="lg">Watch it work</Btn>
             </div>
 
             <div className="hero-visual" data-intro>
@@ -80,7 +68,7 @@ export default function Home() {
                 <span><small className="mono">Link made · sample</small><b>25.00 USDC</b></span>
               </div>
               <div className="chip chip-b" aria-hidden="true">
-                <span className="chip-ico chip-ico-mint">✓</span>
+                <span className="chip-ico">✓</span>
                 <span><small className="mono">Arrived · sample</small><b>Lagos → Lima</b></span>
               </div>
             </div>
@@ -270,7 +258,7 @@ export default function Home() {
         <div className="wrap">
           <div className="foot-top">
             <span className="brand"><span className="brand-mark" aria-hidden="true" /><span className="brand-word">QOVA</span></span>
-            <a href="#make" className="btn btn-chrome btn-sm" data-magnetic>Make a link</a>
+            <Btn href="#make" variant="light" size="sm">Make a link</Btn>
           </div>
           <p className="disclaimer">$QOVA is a memecoin with no intrinsic value and no expectation of profit. It is not a dollar or a stablecoin and its price can go to zero. QOVA pay links are a free, non custodial demo: payments go straight between wallets and QOVA never holds, moves or converts money. USDC is issued by Circle, not by QOVA. Check the rules where you live. Not financial advice.</p>
         </div>

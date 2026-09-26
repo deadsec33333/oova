@@ -56,3 +56,10 @@ A daylight fintech console. Mix of two references Aurimas picked: Stockcoin (chr
 - Giant QOVA wordmark rises in the footer.
 - Token and currency badges are original drawings, not official logos.
 - QA: 390 px and 1366 px, no overflow, no console errors, story steps in sync with the phone, reduced motion turns everything off.
+
+## v3: black and white edition (26 Sep 2026)
+- Whole site is monochrome: white, near black ink, silver chrome. No colour accents. Token and currency badges redrawn in black and white.
+- Nav: floating glass pill that narrows on scroll, rolling text links, scroll progress line inside the pill. Phones get a round menu button that opens a full screen black menu with big staggered links.
+- Buttons: pill buttons with a rolling label on hover, an arrow chip that swaps arrows, a soft sheen, magnetic pull on desktop.
+- Scroll motion calmed down: Lenis lerp 0.09, headings rise line by line out of a mask (no blur), blocks fade up once.
+- Story rebuilt: realistic phone (status bar, island, side buttons, glare, 3D tilt across the scroll), keypad typing 2 5 . 0 0, share sheet, chat with typing dots and link preview, confirm payment with slide to pay and face scan, notification banner, drawn check ring, count up, sparks and receipt. Progress rail and icon steps on desktop, floating tags per step.
