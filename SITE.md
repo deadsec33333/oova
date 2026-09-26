@@ -114,3 +114,13 @@ A daylight fintech console. Mix of two references Aurimas picked: Stockcoin (chr
 - Google and email are shown as Soon.
 - Guards: same origin check on every write, rate limits, nonces work once, forged cookies refused. Tested end to end with a test wallet and a local stand in database.
 - /api/health now also finds Upstash vars under any prefix and pings the database.
+
+## Backend 3 · wallet connect on the site, paid alerts
+- Bug from the first real 1 USDC test: the link was made on the homepage without signing in, the page stopped checking when the payer switched to the wallet, then the homepage reloaded and the link was gone. Money arrived, alert never showed.
+- Fix: links made without signing in are kept on the device (7 days) and watched by a site wide watcher on every page, checking every 15 s and instantly when you come back to the tab. PayStatus also rechecks instantly on return.
+- Connect button in the nav (Wallet Standard sheet, same signed message sign in). Signed in: green dot chip with Dashboard, Copy address, Sign out.
+- Signed in LinkMaker fills your wallet and saves the link to your account. Links made on the device before connecting move into the account.
+- Paid alert: toast on any page, tab title "Paid · X USDC", optional system notification after the person allows alerts (bell button). Each payment alerts once.
+- Fixed: dashboard "What is it for" was stored as the name shown on the pay page.
+- Tested end to end with a fake Solana node: make link, reload, payment lands, alert shows; connect imports device links; dashboard marks Paid; no repeat alert after reload.
+- Not yet: alerts while every QOVA tab is closed (needs Helius webhooks plus web push).

@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ArrowDownLeft, ArrowLeft, Check, ChevronRight, Copy, ExternalLink, House, KeyRound, Link2, LoaderCircle, LogOut, Mail,
   Plus, QrCode, Search, Settings, ShieldCheck, Trash2, Wallet, WalletMinimal, X, Activity as ActivityIcon, Sparkles,
@@ -11,8 +11,8 @@ import Coin from "@/components/Coin";
 import QR from "@/components/QR";
 import { displayAmount, payPageUrl, shortAddress, solanaPayUrl } from "@/lib/solanapay";
 import { watchWallets, walletBrowseLinks, type FoundWallet } from "@/lib/wallets";
-
-type Me = { wallet: string | null; ready: boolean };
+import { signInError, signInWith, signOut as endSession, useAccount, type Phase } from "@/lib/account";
+import AlertButton from "@/components/AlertButton";
 type LinkRec = {
   id: string; to: string; amount: string; label: string; message: string; ref: string; createdAt: number; status: "open" | "paid";
   paid?: { signature: string; payer: string | null; blockTime: number | null; exact: boolean };
@@ -34,20 +34,15 @@ const micro = (a: string) => { const [i, f = ""] = a.split("."); return Number(i
 const fromMicro = (n: number) => displayAmount((n / 1e6).toFixed(6).replace(/0{1,4}$/, ""));
 
 export default function AppPage() {
-  const [me, setMe] = useState<Me | null>(null);
-  useEffect(() => {
-    fetch("/api/auth/me", { cache: "no-store" }).then((r) => r.json()).then(setMe).catch(() => setMe({ wallet: null, ready: false }));
-  }, []);
-  if (!me) return <main className="ax-loading" aria-busy="true"><Mark size={30} /></main>;
-  if (!me.wallet) return <SignIn ready={me.ready} onIn={(w) => setMe({ wallet: w, ready: true })} />;
-  return <Dashboard wallet={me.wallet} onOut={() => setMe({ wallet: null, ready: true })} />;
+  const me = useAccount();
+  if (!me.loaded) return <main className="ax-loading" aria-busy="true"><Mark size={30} /></main>;
+  if (!me.wallet) return <SignIn ready={me.ready} />;
+  return <Dashboard wallet={me.wallet} onOut={endSession} />;
 }
 
 /* ─────────────── Sign in ─────────────── */
 
-type Phase = "idle" | "connect" | "sign" | "verify";
-
-function SignIn({ ready, onIn }: { ready: boolean; onIn: (w: string) => void }) {
+function SignIn({ ready }: { ready: boolean }) {
   const [method, setMethod] = useState<null | "wallet">(null);
   const [wallets, setWallets] = useState<FoundWallet[] | null>(null);
   const [phase, setPhase] = useState<Phase>("idle");
@@ -59,30 +54,10 @@ function SignIn({ ready, onIn }: { ready: boolean; onIn: (w: string) => void }) 
   useEffect(() => { setHere(window.location.href); return watchWallets(setWallets); }, []);
 
   async function go(w: FoundWallet) {
-    setErr(""); setBusy(w.name); setPhase("connect");
-    try {
-      const address = await w.connect();
-      const r = await post("/api/auth/nonce", { wallet: address });
-      if (r.status === 429) throw new Error("slow");
-      if (!r.ok) throw new Error("server");
-      const { message } = (await r.json()) as { message: string };
-      setMsg(message); setPhase("sign");
-      const signature = await w.signMessage(address, message);
-      setPhase("verify");
-      const v = await post("/api/auth/verify", { wallet: address, message, signature });
-      if (!v.ok) throw new Error("verify");
-      window.dispatchEvent(new CustomEvent("qova:made"));
-      onIn(address);
-    } catch (e) {
-      const t = e instanceof Error ? e.message : "";
-      setErr(
-        t === "slow" ? "Too many tries. Wait a minute and try again." :
-        t === "server" ? "Sign in is not available right now. Try again soon." :
-        t === "verify" ? "That signature did not check out. Nothing happened, try again." :
-        "Cancelled in the wallet. Nothing was signed."
-      );
-      setPhase("idle");
-    } finally { setBusy(null); }
+    setErr(""); setBusy(w.name);
+    try { await signInWith(w, (p, m) => { setPhase(p); if (m) setMsg(m); }); }
+    catch (e) { setErr(signInError(e)); setPhase("idle"); }
+    finally { setBusy(null); }
   }
 
   const PH: Record<Phase, string> = { idle: "", connect: "Connecting to your wallet", sign: "Check your wallet and sign the message", verify: "Checking the signature" };
@@ -209,8 +184,6 @@ function Dashboard({ wallet, onOut }: { wallet: string; onOut: () => void }) {
   const [qr, setQr] = useState<LinkRec | null>(null);
   const [sure, setSure] = useState<string | null>(null);
   const [origin, setOrigin] = useState("");
-  const linksRef = useRef<LinkRec[]>([]);
-  linksRef.current = links ?? [];
 
   const load = useCallback(async () => {
     try {
@@ -223,34 +196,23 @@ function Dashboard({ wallet, onOut }: { wallet: string; onOut: () => void }) {
 
   useEffect(() => { setOrigin(window.location.origin); load(); }, [load]);
 
-  // Watch open links on Solana while this tab is visible.
+  // The site wide watcher checks open links on Solana; here we just reflect what it finds.
   useEffect(() => {
-    let stop = false;
-    const tick = async () => {
-      if (document.visibilityState !== "visible") return;
-      const open = linksRef.current.filter((l) => l.status === "open").slice(0, 10);
-      for (const l of open) {
-        if (stop) return;
-        try {
-          const r = await post(`/api/links/${l.id}/check`);
-          const j = (await r.json()) as { link?: LinkRec };
-          if (j.link?.status === "paid") {
-            setLinks((cur) => (cur ?? []).map((x) => (x.id === l.id ? j.link! : x)));
-            window.dispatchEvent(new CustomEvent("qova:made"));
-          }
-        } catch { /* try next round */ }
-      }
+    const onPaid = (e: Event) => {
+      const l = (e as CustomEvent<{ link?: LinkRec; ref: string }>).detail?.link;
+      if (l) setLinks((cur) => (cur ?? []).map((x) => (x.id === l.id ? l : x)));
     };
-    const first = setTimeout(tick, 1200);
-    const iv = setInterval(tick, 20000);
-    return () => { stop = true; clearTimeout(first); clearInterval(iv); };
-  }, []);
+    const reload = () => { load(); };
+    window.addEventListener("qova:paid", onPaid);
+    window.addEventListener("qova:links", reload);
+    return () => { window.removeEventListener("qova:paid", onPaid); window.removeEventListener("qova:links", reload); };
+  }, [load]);
 
   async function create(e: React.FormEvent) {
     e.preventDefault();
     setFormErr(""); setMaking(true);
     try {
-      const r = await post("/api/links", { amount, label });
+      const r = await post("/api/links", { amount, message: label });
       const j = (await r.json()) as { link?: LinkRec; error?: string };
       if (!r.ok || !j.link) {
         setFormErr(j.error === "amount" ? "Enter an amount above 0, up to 6 decimals." : j.error === "slow_down" ? "Slow down a little and try again." : j.error === "signin" ? "Please sign in again." : "Could not save the link. Try again.");
@@ -271,7 +233,7 @@ function Dashboard({ wallet, onOut }: { wallet: string; onOut: () => void }) {
     if (r.ok) setLinks((cur) => (cur ?? []).filter((l) => l.id !== id));
   }
 
-  async function signOut() { try { await post("/api/auth/logout"); } finally { onOut(); } }
+  const signOut = () => onOut();
 
   const pageUrl = (l: LinkRec) => payPageUrl(origin, { to: l.to, amount: l.amount, label: l.label || undefined, message: l.message || undefined, ref: l.ref });
   const all = links ?? [];
@@ -281,10 +243,10 @@ function Dashboard({ wallet, onOut }: { wallet: string; onOut: () => void }) {
     const asc = [...paid].sort((a, b) => (a.paid?.blockTime ?? 0) - (b.paid?.blockTime ?? 0));
     let run = 0; const pts = [0];
     for (const l of asc) { run += micro(l.amount); pts.push(run); }
-    return pts.length > 2 ? pts : [];
+    return pts.length > 1 ? pts : [];
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [links]);
-  const shown = all.filter((l) => !q || (l.label || "pay link").toLowerCase().includes(q.toLowerCase()) || l.amount.includes(q));
+  const shown = all.filter((l) => !q || (l.message || l.label || "pay link").toLowerCase().includes(q.toLowerCase()) || l.amount.includes(q));
   const newest = all.find((l) => l.id === fresh);
   const hour = new Date().getHours();
   const greet = hour < 5 ? "Good night" : hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
@@ -310,6 +272,7 @@ function Dashboard({ wallet, onOut }: { wallet: string; onOut: () => void }) {
           <div><p className="mono ax-date">{new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}</p><h1>{greet}</h1></div>
           <div className="ax-top-r">
             <label className="ax-search"><Search size={16} /><input placeholder="Search links" value={q} onChange={(e) => { setQ(e.target.value); if (tab !== "Home" && tab !== "Links") setTab("Links"); }} /></label>
+            <AlertButton compact className="ax-icon" />
             <ThemeToggle />
             <a href="#quick" className="ax-new" onClick={() => setTab("Home")}><Plus size={16} /> New link</a>
           </div>
@@ -332,7 +295,7 @@ function Dashboard({ wallet, onOut }: { wallet: string; onOut: () => void }) {
               <div className="ax-h"><b>Quick link</b><span className="mono">to {shortAddress(wallet)}</span></div>
               <form onSubmit={create}>
                 <div className="ax-q-amt"><input inputMode="decimal" placeholder="25.00" value={amount} onChange={(e) => setAmount(e.target.value)} aria-label="Amount" required /><span className="mono">USDC</span></div>
-                <input className="ax-q-for" placeholder="What is it for" value={label} maxLength={60} onChange={(e) => setLabel(e.target.value)} aria-label="What is it for" />
+                <input className="ax-q-for" placeholder="What is it for" value={label} maxLength={120} onChange={(e) => setLabel(e.target.value)} aria-label="What is it for" />
                 <button type="submit" className="ax-q-btn" disabled={making}>{making ? <LoaderCircle size={16} className="ax-spin" /> : <Link2 size={16} />} Create link</button>
               </form>
               {formErr && <p className="ax-err" role="alert">{formErr}</p>}
@@ -356,7 +319,7 @@ function Dashboard({ wallet, onOut }: { wallet: string; onOut: () => void }) {
                   {(tab === "Home" ? shown.slice(0, 5) : shown).map((r) => (
                     <div key={r.id} className="ax-row">
                       <span className="ax-row-ico"><Link2 size={15} /></span>
-                      <div className="ax-row-t"><b>{r.label || "Pay link"}</b><span className="mono">{when(r.createdAt)}</span></div>
+                      <div className="ax-row-t"><b>{r.message || r.label || "Pay link"}</b><span className="mono">{when(r.createdAt)}</span></div>
                       <span className="ax-row-a">{displayAmount(r.amount)}<small> USDC</small></span>
                       <span className={`ax-status ax-s-${r.status}`}>{r.status === "paid" ? <><Check size={12} strokeWidth={3} />Paid</> : "Open"}</span>
                       <span className="ax-row-act">
@@ -380,7 +343,7 @@ function Dashboard({ wallet, onOut }: { wallet: string; onOut: () => void }) {
                   {paid.slice(0, tab === "Home" ? 5 : 50).map((x) => (
                     <li key={x.id}>
                       <span className="ax-in"><ArrowDownLeft size={15} /></span>
-                      <div><b>+{displayAmount(x.amount)} USDC</b><span className="mono">{x.paid?.payer ? shortAddress(x.paid.payer) : "Payer"} · {x.label || "Pay link"} · {x.paid?.blockTime ? when(x.paid.blockTime * 1000) : ""}</span></div>
+                      <div><b>+{displayAmount(x.amount)} USDC</b><span className="mono">{x.paid?.payer ? shortAddress(x.paid.payer) : "Payer"} · {x.message || x.label || "Pay link"} · {x.paid?.blockTime ? when(x.paid.blockTime * 1000) : ""}</span></div>
                       {x.paid && <a aria-label="View on Solscan" href={`https://solscan.io/tx/${x.paid.signature}`} target="_blank" rel="noreferrer"><ExternalLink size={14} /></a>}
                     </li>
                   ))}
@@ -415,7 +378,7 @@ function Dashboard({ wallet, onOut }: { wallet: string; onOut: () => void }) {
         <div className="ax-modal" role="dialog" aria-modal="true" aria-label="Pay link QR" onClick={() => setQr(null)}>
           <div className="ax-modal-card" onClick={(e) => e.stopPropagation()}>
             <button className="ax-modal-x" aria-label="Close" onClick={() => setQr(null)}><X size={18} /></button>
-            <p className="mono">{qr.label || "Pay link"}</p>
+            <p className="mono">{qr.message || qr.label || "Pay link"}</p>
             <h3>{displayAmount(qr.amount)} <small>USDC</small></h3>
             <QR value={solanaPayUrl({ to: qr.to, amount: qr.amount, label: qr.label || undefined, message: qr.message || undefined, ref: qr.ref })} label="Scan with a Solana wallet to pay" />
             <p className="ax-fine">Scan with any Solana wallet. Or share the link.</p>

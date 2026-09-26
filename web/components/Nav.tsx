@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpRight, CornerDownLeft, LogIn, Moon, Search, Sun, Link2 } from "lucide-react";
 import { Mark } from "./Logo";
 import ThemeToggle from "./ThemeToggle";
+import WalletButton from "./WalletButton";
 
 type Item = { slug: string; label: string; href: string; hint: string };
 const ITEMS: Item[] = [
@@ -133,6 +134,7 @@ export default function Nav() {
           )}
           <div className="lbar-right">
             <ThemeToggle />
+            <WalletButton />
             <a href="#make" className="lbar-cta" onClick={(e) => { e.preventDefault(); go(ITEMS[3]); }}><span>Make a link</span><ArrowUpRight size={16} strokeWidth={2.2} /></a>
           </div>
         </div>

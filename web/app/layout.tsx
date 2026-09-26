@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
+import AccountHost from "@/components/AccountHost";
 
 const host = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL || "localhost:3000";
 
@@ -21,7 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js');try{if(localStorage.getItem('qova-theme')==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}" }} />
       </head>
-      <body>{children}</body>
+      <body>{children}<AccountHost /></body>
     </html>
   );
 }
