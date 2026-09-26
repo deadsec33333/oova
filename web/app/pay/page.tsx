@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import QR from "@/components/QR";
 import CopyButton from "@/components/CopyButton";
 import Coin from "@/components/Coin";
-import { cleanText, isSolanaAddress, parseAmount, solanaPayUrl, shortAddress } from "@/lib/solanapay";
+import { cleanText, displayAmount, isSolanaAddress, parseAmount, solanaPayUrl, shortAddress } from "@/lib/solanapay";
 
 type SP = Promise<Record<string, string | string[] | undefined>>;
 const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? "";
@@ -11,7 +11,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SP }): 
   const p = await searchParams;
   const amount = parseAmount(one(p.amount));
   const label = cleanText(one(p.label), 48);
-  const title = amount ? `Pay ${amount} USDC${label ? ` to ${label}` : ""} · QOVA` : "QOVA pay link";
+  const title = amount ? `Pay ${displayAmount(amount)} USDC${label ? ` to ${label}` : ""} · QOVA` : "QOVA pay link";
   return { title, description: "Pay with any Solana wallet. Wallet to wallet in USDC.", robots: { index: false } };
 }
 
@@ -47,8 +47,9 @@ export default async function Pay({ searchParams }: { searchParams: SP }) {
         <a href="/" className="brand"><span className="brand-mark" aria-hidden="true" /><span className="brand-word">QOVA</span></a>
         <div className="pay-coin"><Coin size={96} /></div>
         <p className="kicker mono"><span className="sq" />Pay request</p>
-        <h1 className="pay-amount">{amount} <small>USDC</small></h1>
+        <h1 className="pay-amount">{displayAmount(amount!)} <small>USDC</small></h1>
         <p className="pay-to">to <b>{label || shortAddress(to)}</b></p>
+        {label && <p className="pay-note">Name set by the person who made this link.</p>}
         {message && <p className="pay-msg">“{message}”</p>}
 
         <a href={wallet} className="btn btn-chrome btn-wide">Pay with a Solana wallet</a>

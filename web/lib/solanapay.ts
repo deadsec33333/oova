@@ -61,3 +61,10 @@ export function payPageUrl(origin: string, r: PayRequest): string {
 export function shortAddress(a: string): string {
   return a.length > 12 ? `${a.slice(0, 4)}…${a.slice(-4)}` : a;
 }
+
+/** Display only: at least 2 decimals, thousands separators. */
+export function displayAmount(a: string): string {
+  const [i, d = ""] = a.split(".");
+  const dec = d.length >= 2 ? d : (d + "00").slice(0, 2);
+  return `${Number(i).toLocaleString("en-US")}.${dec}`;
+}

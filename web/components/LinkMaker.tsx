@@ -2,7 +2,7 @@
 import { useState } from "react";
 import QR from "./QR";
 import CopyButton from "./CopyButton";
-import { cleanText, isSolanaAddress, newReference, parseAmount, payPageUrl, solanaPayUrl, type PayRequest } from "@/lib/solanapay";
+import { cleanText, displayAmount, isSolanaAddress, newReference, parseAmount, payPageUrl, solanaPayUrl, type PayRequest } from "@/lib/solanapay";
 
 type Result = { req: PayRequest; page: string; wallet: string };
 
@@ -28,7 +28,7 @@ export default function LinkMaker() {
     window.dispatchEvent(new Event("qova:made"));
   }
 
-  const shareText = result ? `Pay me ${result.req.amount} USDC with QOVA` : "";
+  const shareText = result ? `Pay me ${displayAmount(result.req.amount)} USDC with QOVA` : "";
 
   return (
     <div className="maker">
@@ -65,7 +65,7 @@ export default function LinkMaker() {
           <>
             <div className="out-head">
               <span className="mono tag-mint">Link ready</span>
-              <span className="out-amount">{result.req.amount} <small>USDC</small></span>
+              <span className="out-amount">{displayAmount(result.req.amount)} <small>USDC</small></span>
             </div>
             <QR value={result.wallet} label="QR code: scan with a Solana wallet to pay" />
             <p className="fine center">Scan with Phantom, Solflare or any Solana wallet to pay now.</p>
