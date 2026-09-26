@@ -94,3 +94,8 @@ A daylight fintech console. Mix of two references Aurimas picked: Stockcoin (chr
 - SOL, DOGE and USDC use the official artwork Aurimas supplied (web/public/tokens), cropped into glossy coins with rim, shine and shadow. Other coins stay as brand colour ticker coins until their files are supplied.
 - Orbit coins always float above the big coin, on a wider, calmer ellipse.
 - Security section rebuilt as a dark cinematic panel right after the story: "We can't touch your money. Not won't. Can't." with scroll lit words, a Typical app vs QOVA switch (coins get stuck in "their account" vs fly straight to you, labelled illustration), four counters that count down to an honest 0, and "Don't trust us. Verify." with the link anatomy and links to the Solana Pay spec and USDC.
+
+## v8: all official token art, minted coin (27 Sep 2026)
+- WIF, BONK, BTC and ETH now use the official artwork Aurimas supplied too (all 7 orbit coins are official art except JUP).
+- The orbit is computed from the big coin's size, so small coins never cross or cover it.
+- The big coin is now minted: engraved rim text ("QOVA · DOLLARS FOR EVERYONE · ONE LINK AWAY · WALLET TO WALLET"), a dotted ring, a slowly turning guilloché rosette like banknote security print, a raised bevelled mark and a soft holographic sheen, on both faces.

@@ -16,17 +16,21 @@ export default function HeroOrbit() {
     const items = Array.from(root.querySelectorAll<HTMLElement>(".orb"));
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let raf = 0, t = 0.4, visible = true, last = performance.now();
+    const coin = root.parentElement?.querySelector<HTMLElement>(".coin-stage");
     const place = () => {
       const w = root.clientWidth, h = root.clientHeight;
-      const rx = w * 0.44, ry = h * 0.3;
+      // keep every coin clear of the big coin: the ellipse always stays outside its radius
+      const R = coin ? coin.offsetWidth / 2 : 110;
+      const tok = 34;
+      const ry = Math.max(h * 0.3, R + tok + 6);
+      const rx = Math.max(w * 0.44, ry * 1.3);
       items.forEach((el, k) => {
         const a = t + (k / items.length) * Math.PI * 2;
-        const x = Math.cos(a) * rx, y = Math.sin(a) * ry - x * 0.12;
+        const x = Math.cos(a) * rx, y = Math.sin(a) * ry;
         const depth = (Math.sin(a) + 1) / 2;
-        const sc = 0.82 + depth * 0.3;
+        const sc = 0.86 + depth * 0.24;
         el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${sc.toFixed(3)})`;
         el.style.zIndex = String(10 + Math.round(depth * 10));
-        el.style.opacity = "1";
       });
     };
     const loop = (now: number) => {

@@ -1045,3 +1045,23 @@ html[data-theme="dark"] .trust2 { background: radial-gradient(120% 70% at 50% 0%
 .trust2 + .bento-sec { padding-top: 110px; }
 .cmp-short { display: none; }
 @media (max-width: 520px) { .cmp-long { display: none; } .cmp-short { display: inline; } .cmp-switch button { padding: 0 14px; } }
+
+/* minted coin face */
+.c-disc { inset: 5.5%; background: none; box-shadow: inset 0 4px 10px rgba(0,0,0,.28), inset 0 -3px 5px rgba(255,255,255,.95), 0 0 0 1px rgba(255,255,255,.7), 0 0 0 2.5px rgba(0,0,0,.08); overflow: hidden; }
+.c-art { width: 100%; height: 100%; display: block; }
+.c-rimtxt { font: 700 9.2px var(--mono); letter-spacing: 2.1px; }
+.c-rimtxt-d { fill: #8a8a8a; }
+.c-rimtxt-l { fill: #ffffff; opacity: .75; mix-blend-mode: screen; }
+.c-rose { transform-origin: 100px 100px; animation: rose 60s linear infinite; }
+@keyframes rose { to { transform: rotate(360deg); } }
+.c-holo { position: absolute; inset: 5.5%; border-radius: 50%; pointer-events: none; opacity: .55; mix-blend-mode: overlay; background: conic-gradient(from 0deg, rgba(255,0,150,0) 0deg, rgba(0,190,255,.55) 60deg, rgba(255,230,0,.45) 120deg, rgba(0,255,170,.5) 190deg, rgba(160,80,255,.5) 260deg, rgba(255,0,150,0) 360deg); animation: holo 9s linear infinite; }
+@keyframes holo { to { transform: rotate(360deg); } }
+.c-rim { background: conic-gradient(from 210deg, #fefefe, #a9a9a9, #626262, #d9d9d9, #ffffff, #8f8f8f, #ededed, #fefefe); }
+.c-rim::after { content: ""; position: absolute; inset: 1.5%; border-radius: 50%; background: repeating-conic-gradient(from 0deg, rgba(0,0,0,.08) 0 1.5deg, rgba(255,255,255,.12) 1.5deg 3deg); -webkit-mask: radial-gradient(circle, transparent 90%, #000 91%); mask: radial-gradient(circle, transparent 90%, #000 91%); }
+@media (max-width: 899px) { .hero-visual .coin-stage { width: 190px !important; height: 190px !important; } }
+.c-holo { opacity: .36; }
+@media (max-width: 899px) {
+  .hero-visual { height: 410px; margin-top: 30px; }
+  .orbit-field { height: 390px; }
+  .chip-a { top: 0; } .chip-b { bottom: 0; }
+}

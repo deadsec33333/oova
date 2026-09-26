@@ -23,7 +23,10 @@ const SPEC: Record<Exclude<TokenKind, "qova">, Spec> = {
 };
 
 /** Official artwork supplied by the owner for these tokens. */
-const IMG: Partial<Record<TokenKind, string>> = { sol: "/tokens/sol.webp", doge: "/tokens/doge.webp", usdc: "/tokens/usdc.webp" };
+const IMG: Partial<Record<TokenKind, string>> = {
+  sol: "/tokens/sol.webp", doge: "/tokens/doge.webp", usdc: "/tokens/usdc.webp",
+  wif: "/tokens/wif.webp", bonk: "/tokens/bonk.webp", btc: "/tokens/btc.webp", eth: "/tokens/eth.webp",
+};
 
 export default function TokenIcon({ kind, size = 40, className }: { kind: TokenKind; size?: number; className?: string }) {
   const cls = `tk${className ? ` ${className}` : ""}`;
