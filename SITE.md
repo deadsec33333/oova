@@ -44,3 +44,15 @@ A daylight fintech console. Mix of two references Aurimas picked: Stockcoin (chr
 - Pay page and broken link page checked.
 - Reduced motion: all animation off.
 - Not done yet: a real payment test with a phone wallet, Lighthouse run, OG image check on X.
+
+## v2: motion and show off layer (26 Sep 2026)
+- Lenis smooth scrolling synced with GSAP ScrollTrigger; SplitText word reveals that play in and reverse out; scrubbed lore text; parallax; nav hides on scroll down; mint progress bar.
+- Entry ritual: the Q draws itself (1.25 s, once per session, tap to skip, CSS failsafe).
+- Hero: masked line reveal, rotating word (everyone, freelancers, families, small shops, creators), 8 token and currency badges orbiting the coin in 3D, magnetic chrome buttons with a shine sweep, faint grid.
+- Currency rail: NGN, PHP, BRL, KES, IDR, PEN, ARS, GHS, MXN to USDC (symbols only, no rates).
+- Story: pinned scroll section, a phone plays a full payment in 4 steps (type, share, slide to pay, arrived with count up and sparks). Sample data, labelled.
+- Bento: 6 cards with Lucide icons, pointer tilt and glow, live micro animations (rolling amount, QR scan line, wallet names, chat bubbles, lock wiggle, real stats: 0 accounts, 1 link, 24/7, under $0.01 typical fee).
+- Dark band: draggable halftone globe with sample payment arcs between 20 cities, cursor spotlight, then the real link maker.
+- Giant QOVA wordmark rises in the footer.
+- Token and currency badges are original drawings, not official logos.
+- QA: 390 px and 1366 px, no overflow, no console errors, story steps in sync with the phone, reduced motion turns everything off.
