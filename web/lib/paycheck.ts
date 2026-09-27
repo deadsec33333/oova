@@ -31,3 +31,19 @@ export async function checkPayment(to: string, amount: string, ref: string): Pro
   }
   return { status: "pending" };
 }
+
+/**
+ * How much USDC a known transaction delivered to `to`. Used for card payments, where the provider
+ * sends the USDC and tells us the transaction id. Read only. "retry" when the RPC could not answer,
+ * null when the transaction is not visible (or failed) on chain yet.
+ */
+export async function verifyTransfer(signature: string, to: string): Promise<{ received: bigint; blockTime: number | null } | null | "retry"> {
+  if (!/^[1-9A-HJ-NP-Za-km-z]{32,100}$/.test(signature)) return null;
+  let tx: Tx | null;
+  try {
+    tx = await rpc<Tx | null>("getTransaction", [signature, { encoding: "jsonParsed", commitment: "confirmed", maxSupportedTransactionVersion: 0 }]);
+  } catch { return "retry"; }
+  if (!tx?.meta || tx.meta.err) return null;
+  const received = bal(tx.meta.postTokenBalances, to) - bal(tx.meta.preTokenBalances, to);
+  return received > 0n ? { received, blockTime: tx.blockTime } : null;
+}

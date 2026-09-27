@@ -20,5 +20,6 @@ export async function GET() {
     authSecret: has("AUTH_SECRET"),
     google: has("AUTH_GOOGLE_ID") && has("AUTH_GOOGLE_SECRET"),
     email: has("AUTH_RESEND_KEY"),
+    cardOnramp: has("MOONPAY_PUBLISHABLE_KEY") && has("MOONPAY_SECRET_KEY") && has("MOONPAY_WEBHOOK_KEY"),
   }, { headers: { "cache-control": "no-store" } });
 }
