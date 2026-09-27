@@ -1,39 +1,25 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ArrowDownLeft, ArrowLeft, Check, ChevronRight, Copy, ExternalLink, House, KeyRound, Link2, LoaderCircle, LogOut, Mail,
-  Plus, QrCode, Search, Settings, ShieldCheck, Trash2, Wallet, WalletMinimal, X, Activity as ActivityIcon, Sparkles,
+  ArrowLeft, ChevronRight, ExternalLink, House, KeyRound, Link2, LoaderCircle, LogOut, Mail, Plus, ShieldCheck, Wallet, WalletMinimal, Activity as ActivityIcon, Info,
 } from "lucide-react";
 import { Mark } from "@/components/Logo";
 import TokenIcon from "@/components/TokenIcon";
 import ThemeToggle from "@/components/ThemeToggle";
 import Coin from "@/components/Coin";
-import QR from "@/components/QR";
-import PayStatus from "@/components/PayStatus";
-import { displayAmount, payPageUrl, shortAddress, solanaPayUrl } from "@/lib/solanapay";
+import { payPageUrl, shortAddress } from "@/lib/solanapay";
 import { watchWallets, walletBrowseLinks, type FoundWallet } from "@/lib/wallets";
 import { signInError, signInWith, signOut as endSession, useAccount, type Phase } from "@/lib/account";
 import AlertButton from "@/components/AlertButton";
-type LinkRec = {
-  id: string; to: string; amount: string; label: string; message: string; ref: string; createdAt: number; status: "open" | "paid";
-  paid?: { signature: string; payer: string | null; blockTime: number | null; exact: boolean };
-};
-
-const post = (url: string, body?: unknown) =>
-  fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
-
-function when(ms: number) {
-  const d = Date.now() - ms, m = Math.round(d / 60000);
-  if (m < 1) return "Just now";
-  if (m < 60) return `${m} min ago`;
-  const h = Math.round(m / 60);
-  if (h < 24) return `${h} h ago`;
-  if (h < 48) return "Yesterday";
-  return new Date(ms).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
-}
-const micro = (a: string) => { const [i, f = ""] = a.split("."); return Number(i) * 1e6 + Number((f + "000000").slice(0, 6)); };
-const fromMicro = (n: number) => displayAmount((n / 1e6).toFixed(6).replace(/0{1,4}$/, ""));
-
+import BalanceCard, { type Bal } from "@/components/app/BalanceCard";
+import QuickLink from "@/components/app/QuickLink";
+import LinksList from "@/components/app/LinksList";
+import ActivityFeed from "@/components/app/ActivityFeed";
+import LinkDetail from "@/components/app/LinkDetail";
+import CounterMode from "@/components/app/CounterMode";
+import WalletPanel from "@/components/app/WalletPanel";
+import SoundSwitch from "@/components/app/SoundSwitch";
+import { Sheet, fromMicro, micro, post, useReducedMotion, type LinkRec } from "@/components/app/shared";
 export default function AppPage() {
   const me = useAccount();
   if (!me.loaded) return <main className="ax-loading" aria-busy="true"><Mark size={30} /></main>;
@@ -148,45 +134,31 @@ Nonce: <one time code>`}</pre>
 
 /* ─────────────── Dashboard ─────────────── */
 
-function Spark({ points }: { points: number[] }) {
-  const w = 300, h = 80;
-  if (points.length < 2) return <div className="ax-spark ax-spark-empty"><span>Your first payments will draw this line.</span></div>;
-  const max = Math.max(...points), min = Math.min(0, ...points);
-  const pts = points.map((v, i) => [(i / (points.length - 1)) * w, h - ((v - min) / (max - min || 1)) * (h - 10) - 5]);
-  const d = pts.map((p, i) => `${i ? "L" : "M"}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(" ");
-  return (
-    <svg className="ax-spark" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden="true">
-      <defs><linearGradient id="axsg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="currentColor" stopOpacity=".18" /><stop offset="1" stopColor="currentColor" stopOpacity="0" /></linearGradient></defs>
-      <path d={`${d} L${w} ${h} L0 ${h} Z`} fill="url(#axsg)" />
-      <path d={d} fill="none" stroke="currentColor" strokeWidth="2" className="ax-spark-line" />
-    </svg>
-  );
-}
-
-function CopyIcon({ text, label }: { text: string; label: string }) {
-  const [ok, setOk] = useState(false);
-  return (
-    <button aria-label={label} title={label} onClick={async () => { try { await navigator.clipboard.writeText(text); setOk(true); setTimeout(() => setOk(false), 1400); } catch { /* ignore */ } }}>
-      {ok ? <Check size={15} /> : <Copy size={15} />}
-    </button>
-  );
-}
+type Tab = "home" | "links" | "activity" | "wallet";
+const TABS: [Tab, string, React.ReactNode][] = [
+  ["home", "Home", <House key="h" size={19} />],
+  ["links", "Links", <Link2 key="l" size={19} />],
+  ["activity", "Activity", <ActivityIcon key="a" size={19} />],
+  ["wallet", "Wallet", <Wallet key="w" size={19} />],
+];
+const TITLE: Record<Tab, string> = { home: "", links: "Links", activity: "Activity", wallet: "Wallet" };
 
 function Dashboard({ wallet, onOut }: { wallet: string; onOut: () => void }) {
   const [links, setLinks] = useState<LinkRec[] | null>(null);
   const [loadErr, setLoadErr] = useState("");
-  const [tab, setTab] = useState("Home");
-  const [q, setQ] = useState("");
-  const [amount, setAmount] = useState("");
-  const [label, setLabel] = useState("");
-  const [making, setMaking] = useState(false);
-  const [formErr, setFormErr] = useState("");
-  const [fresh, setFresh] = useState<string | null>(null);
-  const [qr, setQr] = useState<LinkRec | null>(null);
-  const [sure, setSure] = useState<string | null>(null);
+  const [tab, setTabRaw] = useState<Tab>("home");
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const [counter, setCounter] = useState<LinkRec | null>(null);
+  const [newOpen, setNewOpen] = useState(false);
+  const [bal, setBal] = useState<Bal>({ state: "loading" });
   const [origin, setOrigin] = useState("");
+  const [greet, setGreet] = useState("");
+  const reduce = useReducedMotion();
   const linksNow = useRef<LinkRec[] | null>(null);
   linksNow.current = links;
+  const balAt = useRef(0);
+
+  const setTab = (t: Tab) => { setTabRaw(t); window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); };
 
   const load = useCallback(async () => {
     try {
@@ -194,210 +166,140 @@ function Dashboard({ wallet, onOut }: { wallet: string; onOut: () => void }) {
       if (r.status === 401) return onOut();
       if (!r.ok) throw new Error();
       setLinks(((await r.json()) as { links: LinkRec[] }).links); setLoadErr("");
-    } catch { setLoadErr("Could not load your links. Retrying."); }
+    } catch { setLoadErr("Could not load your links."); }
   }, [onOut]);
 
-  useEffect(() => { setOrigin(window.location.origin); load(); }, [load]);
+  // On chain USDC balance. Server caches it for about 30 s; we only ask on open, on return and after a payment.
+  const loadBal = useCallback(async (force = false) => {
+    if (!force && Date.now() - balAt.current < 30_000) return;
+    balAt.current = Date.now();
+    try {
+      const r = await fetch("/api/wallet/balance", { cache: "no-store" });
+      if (r.status === 401) return;
+      const j = (await r.json()) as { usdc?: string };
+      setBal(r.ok && typeof j.usdc === "string" ? { state: "ok", usdc: j.usdc } : (b) => (b.state === "ok" ? b : { state: "err" }));
+    } catch { setBal((b) => (b.state === "ok" ? b : { state: "err" })); }
+  }, []);
 
-  // The site wide watcher checks open links on Solana; here we just reflect what it finds.
+  useEffect(() => {
+    setOrigin(window.location.origin);
+    const h = new Date().getHours();
+    setGreet(h < 5 ? "Good night" : h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening");
+    load(); loadBal(true);
+    const vis = () => { if (document.visibilityState === "visible") loadBal(); };
+    document.addEventListener("visibilitychange", vis);
+    return () => document.removeEventListener("visibilitychange", vis);
+  }, [load, loadBal]);
+
+  // AccountHost is the one watcher for open links; the dashboard only reflects what it finds.
   useEffect(() => {
     const onPaid = async (e: Event) => {
       const d = (e as CustomEvent<{ link?: LinkRec; ref: string }>).detail;
       let l = d?.link;
       if (!l && d?.ref) {
-        // Seen live on screen (QR open): have the server confirm and save it too.
+        // Seen live on screen (counter QR): have the server confirm and save it too.
         const row = (linksNow.current ?? []).find((x) => x.ref === d.ref && x.status === "open");
         if (row) { try { l = ((await (await post(`/api/links/${row.id}/check`)).json()) as { link?: LinkRec }).link; } catch { /* next round */ } }
       }
       if (l?.status === "paid") setLinks((cur) => (cur ?? []).map((x) => (x.id === l!.id ? l! : x)));
+      setTimeout(() => loadBal(true), 2500);
     };
     const reload = () => { load(); };
     window.addEventListener("qova:paid", onPaid);
     window.addEventListener("qova:links", reload);
     return () => { window.removeEventListener("qova:paid", onPaid); window.removeEventListener("qova:links", reload); };
-  }, [load]);
-
-  async function create(e: React.FormEvent) {
-    e.preventDefault();
-    setFormErr(""); setMaking(true);
-    try {
-      const r = await post("/api/links", { amount, message: label });
-      const j = (await r.json()) as { link?: LinkRec; error?: string };
-      if (!r.ok || !j.link) {
-        setFormErr(j.error === "amount" ? "Enter an amount above 0, up to 6 decimals." : j.error === "slow_down" ? "Slow down a little and try again." : j.error === "signin" ? "Please sign in again." : "Could not save the link. Try again.");
-        if (j.error === "signin") onOut();
-        return;
-      }
-      setLinks((cur) => [j.link!, ...(cur ?? [])]);
-      setFresh(j.link.id); setAmount(""); setLabel("");
-      window.dispatchEvent(new CustomEvent("qova:made"));
-    } catch { setFormErr("Could not save the link. Try again."); }
-    finally { setMaking(false); }
-  }
+  }, [load, loadBal]);
 
   async function remove(id: string) {
-    if (sure !== id) { setSure(id); setTimeout(() => setSure((s) => (s === id ? null : s)), 3000); return; }
-    setSure(null);
-    const r = await fetch(`/api/links/${id}`, { method: "DELETE" });
-    if (r.ok) setLinks((cur) => (cur ?? []).filter((l) => l.id !== id));
+    try {
+      const r = await fetch(`/api/links/${id}`, { method: "DELETE" });
+      if (r.ok) { setLinks((cur) => (cur ?? []).filter((l) => l.id !== id)); return true; }
+    } catch { /* fall through */ }
+    return false;
   }
 
-  const signOut = () => onOut();
-
-  const pageUrl = (l: LinkRec) => payPageUrl(origin, { to: l.to, amount: l.amount, label: l.label || undefined, message: l.message || undefined, ref: l.ref });
-  const all = links ?? [];
-  const paid = all.filter((l) => l.status === "paid").sort((a, b) => (b.paid?.blockTime ?? 0) - (a.paid?.blockTime ?? 0));
-  const received = paid.reduce((s, l) => s + micro(l.amount), 0);
-  const spark = useMemo(() => {
-    const asc = [...paid].sort((a, b) => (a.paid?.blockTime ?? 0) - (b.paid?.blockTime ?? 0));
-    let run = 0; const pts = [0];
-    for (const l of asc) { run += micro(l.amount); pts.push(run); }
-    return pts.length > 1 ? pts : [];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [links]);
-  const shown = all.filter((l) => !q || (l.message || l.label || "pay link").toLowerCase().includes(q.toLowerCase()) || l.amount.includes(q));
-  const newest = all.find((l) => l.id === fresh);
-  const hour = new Date().getHours();
-  const greet = hour < 5 ? "Good night" : hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
-  const show = (s: string) => tab === "Home" || tab === s;
-
-  const NAV: [string, React.ReactNode][] = [["Home", <House key="h" size={18} />], ["Links", <Link2 key="l" size={18} />], ["Activity", <ActivityIcon key="a" size={18} />], ["Wallets", <Wallet key="w" size={18} />], ["Settings", <Settings key="s" size={18} />]];
+  const pageUrl = useCallback((l: LinkRec) => payPageUrl(origin, { to: l.to, amount: l.amount, label: l.label || undefined, message: l.message || undefined, ref: l.ref }), [origin]);
+  const all = useMemo(() => links ?? [], [links]);
+  const openCount = all.filter((l) => l.status === "open").length;
+  const receivedAll = links ? fromMicro(all.filter((l) => l.status === "paid").reduce((s, l) => s + micro(l.amount), 0)) : null;
+  const detail = detailId ? all.find((l) => l.id === detailId) ?? null : null;
+  const counterLive = counter ? all.find((l) => l.id === counter.id) ?? counter : null;
+  const made = (l: LinkRec) => { setLinks((cur) => [l, ...(cur ?? []).filter((x) => x.id !== l.id)]); window.dispatchEvent(new CustomEvent("qova:made")); };
+  const openNew = () => setNewOpen(true);
+  const openDetail = (l: LinkRec) => setDetailId(l.id);
+  const openCounter = (l: LinkRec) => { setDetailId(null); setNewOpen(false); setCounter(l); };
+  const quick = (autoFocus = false) => <QuickLink wallet={wallet} pageUrl={pageUrl} onMade={made} onCounter={openCounter} onSignedOut={onOut} autoFocus={autoFocus} />;
 
   return (
     <div className="ax-shell">
-      <aside className="ax-side">
+      <aside className="ax-side" aria-label="Main">
         <a href="/" className="ax-logo"><Mark size={22} /> QOVA</a>
-        <nav className="ax-nav">{NAV.map(([n, i]) => <button key={n} className={tab === n ? "is-on" : ""} onClick={() => setTab(n)}>{i}<span>{n}</span></button>)}</nav>
+        <button className="ax-btn ax-btn-main ax-side-new" onClick={openNew}><Plus size={16} /> New link</button>
+        <nav className="ax-nav">
+          {TABS.map(([k, n, i]) => <button key={k} className={tab === k ? "is-on" : ""} aria-current={tab === k ? "page" : undefined} onClick={() => setTab(k)}>{i}<span>{n}</span>{k === "links" && links && openCount > 0 && <em>{openCount}</em>}</button>)}
+        </nav>
+        <div className="ax-side-note"><Info size={14} /><p>Early beta. Payments go wallet to wallet. $QOVA is a memecoin, not a dollar.</p></div>
         <div className="ax-user">
-          <span className="ax-av">{wallet.slice(0, 1)}</span>
-          <div><b>{shortAddress(wallet)}</b><span className="mono">Signed in</span></div>
-          <button aria-label="Sign out" onClick={signOut}><LogOut size={16} /></button>
+          <span className="ax-av"><Wallet size={16} /></span>
+          <div><b>{shortAddress(wallet)}</b><span>Signed in</span></div>
+          <button aria-label="Sign out" title="Sign out" onClick={onOut}><LogOut size={16} /></button>
         </div>
       </aside>
 
-      <div className="ax-main">
-        <div className="ax-banner"><Sparkles size={14} /> Early beta · payments go wallet to wallet · $QOVA is a memecoin, not a dollar</div>
+      <main className="ax-main">
         <header className="ax-top">
-          <div><p className="mono ax-date">{new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}</p><h1>{greet}</h1></div>
+          <a href="/" className="ax-logo ax-top-logo"><Mark size={20} /> QOVA</a>
+          <div className="ax-top-t">
+            {tab === "home"
+              ? <><p className="mono ax-date">{new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}</p><h1>{greet || " "}</h1></>
+              : <><p className="mono ax-date">{shortAddress(wallet)}</p><h1>{TITLE[tab]}</h1></>}
+          </div>
           <div className="ax-top-r">
-            <label className="ax-search"><Search size={16} /><input placeholder="Search links" value={q} onChange={(e) => { setQ(e.target.value); if (tab !== "Home" && tab !== "Links") setTab("Links"); }} /></label>
             <AlertButton compact className="ax-icon" />
+            <SoundSwitch />
             <ThemeToggle />
-            <a href="#quick" className="ax-new" onClick={() => setTab("Home")}><Plus size={16} /> New link</a>
+            <button className="ax-btn ax-btn-main ax-top-new" onClick={openNew}><Plus size={16} /> New link</button>
           </div>
         </header>
+        <p className="ax-beta"><Info size={13} /> Early beta · payments go wallet to wallet · $QOVA is a memecoin, not a dollar</p>
 
-        {loadErr && <p className="ax-err">{loadErr} <button className="ax-text" onClick={load}>Retry</button></p>}
+        {loadErr && <p className="ax-err" role="alert">{loadErr} <button className="ax-linkbtn" onClick={load}>Try again</button></p>}
 
-        <div className="ax-grid">
-          {show("Activity") && (
-            <section className="ax-card2 ax-bal">
-              <div className="ax-bal-h"><span className="mono">Received through your links</span><span className="ax-pill">{paid.length} paid</span></div>
-              <div className="ax-bal-v"><TokenIcon kind="usdc" size={36} /><b>{links ? fromMicro(received) : "…"}</b><small>USDC</small></div>
-              <Spark points={spark} />
-              <div className="ax-bal-f"><span><b>{paid.length}</b> payments</span><span><b>{all.length - paid.length}</b> open links</span><span><b>{all.length}</b> links</span></div>
-            </section>
+        <div className="ax-view" key={tab}>
+          {tab === "home" && (
+            <div className="ax-home">
+              <BalanceCard links={links} bal={bal} openCount={openCount} total={all.length} reduce={reduce} />
+              <section className="ax-tile ax-quick-card" aria-label="Quick link">
+                <div className="ax-h"><h2>Quick link</h2><span className="mono">to {shortAddress(wallet)}</span></div>
+                {quick()}
+              </section>
+              <LinksList links={links} compact onOpen={openDetail} onCounter={openCounter} onNew={openNew} onAll={() => setTab("links")} pageUrl={pageUrl} />
+              <ActivityFeed links={links} compact onOpen={openDetail} onAll={() => setTab("activity")} />
+            </div>
           )}
-
-          {show("Links") && (
-            <section className="ax-card2 ax-quick" id="quick">
-              <div className="ax-h"><b>Quick link</b><span className="mono">to {shortAddress(wallet)}</span></div>
-              <form onSubmit={create}>
-                <div className="ax-q-amt"><input inputMode="decimal" placeholder="25.00" value={amount} onChange={(e) => setAmount(e.target.value)} aria-label="Amount" required /><span className="mono">USDC</span></div>
-                <input className="ax-q-for" placeholder="What is it for" value={label} maxLength={120} onChange={(e) => setLabel(e.target.value)} aria-label="What is it for" />
-                <button type="submit" className="ax-q-btn" disabled={making}>{making ? <LoaderCircle size={16} className="ax-spin" /> : <Link2 size={16} />} Create link</button>
-              </form>
-              {formErr && <p className="ax-err" role="alert">{formErr}</p>}
-              {newest && (
-                <div className="ax-made" role="status">
-                  <span><Check size={14} strokeWidth={3} /> Link ready · {displayAmount(newest.amount)} USDC</span>
-                  <span className="ax-row-act"><CopyIcon text={pageUrl(newest)} label="Copy link" /><button aria-label="Show QR" onClick={() => setQr(newest)}><QrCode size={15} /></button></span>
-                </div>
-              )}
-              <p className="ax-fine">Wallet to wallet. We never hold your money.</p>
-            </section>
-          )}
-
-          {show("Links") && (
-            <section className="ax-card2 ax-links">
-              <div className="ax-h"><b>Your pay links</b>{tab === "Home" && all.length > 5 && <button className="ax-text" onClick={() => setTab("Links")}>View all <ChevronRight size={14} /></button>}</div>
-              {links === null ? <p className="ax-empty">Loading…</p> : shown.length === 0 ? (
-                <p className="ax-empty">{q ? "No links match." : "No links yet. Make your first one with Quick link."}</p>
-              ) : (
-                <div className="ax-table">
-                  {(tab === "Home" ? shown.slice(0, 5) : shown).map((r) => (
-                    <div key={r.id} className="ax-row">
-                      <span className="ax-row-ico"><Link2 size={15} /></span>
-                      <div className="ax-row-t"><b>{r.message || r.label || "Pay link"}</b><span className="mono">{when(r.createdAt)}</span></div>
-                      <span className="ax-row-a">{displayAmount(r.amount)}<small> USDC</small></span>
-                      <span className={`ax-status ax-s-${r.status}`}>{r.status === "paid" ? <><Check size={12} strokeWidth={3} />Paid</> : "Open"}</span>
-                      <span className="ax-row-act">
-                        <CopyIcon text={pageUrl(r)} label="Copy link" />
-                        <button aria-label="Show QR" title="Show QR" onClick={() => setQr(r)}><QrCode size={15} /></button>
-                        <a aria-label="Open pay page" title="Open pay page" href={pageUrl(r)} target="_blank" rel="noreferrer"><ExternalLink size={15} /></a>
-                        <button aria-label={sure === r.id ? "Tap again to delete" : "Delete link"} title={sure === r.id ? "Tap again to delete" : "Delete"} className={sure === r.id ? "is-danger" : ""} onClick={() => remove(r.id)}><Trash2 size={15} /></button>
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </section>
-          )}
-
-          {show("Activity") && (
-            <section className="ax-card2 ax-act">
-              <div className="ax-h"><b>Activity</b><span className="ax-live"><i /> Live</span></div>
-              {paid.length === 0 ? <p className="ax-empty">Payments to your links show up here within seconds.</p> : (
-                <ul>
-                  {paid.slice(0, tab === "Home" ? 5 : 50).map((x) => (
-                    <li key={x.id}>
-                      <span className="ax-in"><ArrowDownLeft size={15} /></span>
-                      <div><b>+{displayAmount(x.amount)} USDC</b><span className="mono">{x.paid?.payer ? shortAddress(x.paid.payer) : "Payer"} · {x.message || x.label || "Pay link"} · {x.paid?.blockTime ? when(x.paid.blockTime * 1000) : ""}</span></div>
-                      {x.paid && <a aria-label="View on Solscan" href={`https://solscan.io/tx/${x.paid.signature}`} target="_blank" rel="noreferrer"><ExternalLink size={14} /></a>}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          )}
-
-          {show("Wallets") && (
-            <section className="ax-card2 ax-acc">
-              <div className="ax-h"><b>Connected accounts</b></div>
-              <div className="ax-acc-row"><span className="ax-m-ico"><Wallet size={16} /></span><div><b>Wallet</b><span className="mono">{shortAddress(wallet)} · receives payments</span></div><span className="ax-ok ax-primary">Primary</span></div>
-              <div className="ax-acc-row is-soon"><span className="ax-m-ico ax-g">G</span><div><b>Google</b><span className="mono">Coming soon</span></div><span className="ax-soon">Soon</span></div>
-              <p className="ax-fine"><ShieldCheck size={13} /> Wallets are linked by signing a free message. Never a transaction.</p>
-            </section>
-          )}
-
-          {tab === "Settings" && (
-            <section className="ax-card2 ax-acc">
-              <div className="ax-h"><b>Settings</b></div>
-              <div className="ax-acc-row"><span className="ax-m-ico"><Sparkles size={16} /></span><div><b>Theme</b><span className="mono">Light or dark</span></div><ThemeToggle /></div>
-              <div className="ax-acc-row"><span className="ax-m-ico"><KeyRound size={16} /></span><div><b>Session</b><span className="mono">Stays signed in for 30 days</span></div><button className="ax-text" onClick={signOut}>Sign out</button></div>
-              <p className="ax-fine">We store your public address and the links you make. No keys, no funds, ever.</p>
-            </section>
-          )}
+          {tab === "links" && <LinksList links={links} onOpen={openDetail} onCounter={openCounter} onNew={openNew} pageUrl={pageUrl} />}
+          {tab === "activity" && <ActivityFeed links={links} onOpen={openDetail} />}
+          {tab === "wallet" && <WalletPanel wallet={wallet} bal={bal} onRefresh={() => loadBal(true)} onSignOut={onOut} received={receivedAll} />}
         </div>
-      </div>
+      </main>
 
-      <nav className="ax-tabbar">{NAV.map(([n, i]) => <button key={n} className={tab === n ? "is-on" : ""} onClick={() => setTab(n)}>{i}<span>{n}</span></button>)}</nav>
+      <nav className="ax-tabbar" aria-label="Main">
+        {TABS.slice(0, 2).map(([k, n, i]) => <button key={k} className={tab === k ? "is-on" : ""} aria-current={tab === k ? "page" : undefined} onClick={() => setTab(k)}>{i}<span>{n}</span></button>)}
+        <button className="ax-tab-new" onClick={openNew} aria-label="New link"><Plus size={22} /></button>
+        {TABS.slice(2).map(([k, n, i]) => <button key={k} className={tab === k ? "is-on" : ""} aria-current={tab === k ? "page" : undefined} onClick={() => setTab(k)}>{i}<span>{n}</span></button>)}
+      </nav>
 
-      {qr && (
-        <div className="ax-modal" role="dialog" aria-modal="true" aria-label="Pay link QR" onClick={() => setQr(null)}>
-          <div className="ax-modal-card" onClick={(e) => e.stopPropagation()}>
-            <button className="ax-modal-x" aria-label="Close" onClick={() => setQr(null)}><X size={18} /></button>
-            <p className="mono">{qr.message || qr.label || "Pay link"}</p>
-            <h3>{displayAmount(qr.amount)} <small>USDC</small></h3>
-            <QR value={solanaPayUrl({ to: qr.to, amount: qr.amount, label: qr.label || undefined, message: qr.message || undefined, ref: qr.ref })} label="Scan with a Solana wallet to pay" />
-            {(() => { const live = all.find((x) => x.id === qr.id) ?? qr; return live.status === "paid" && live.paid
-              ? <div className="pst is-paid" role="status"><span className="pst-ico"><Check size={16} strokeWidth={3} /></span><div><b>Paid · {displayAmount(live.amount)} USDC received</b><span className="mono">confirmed on Solana</span></div><a href={`https://solscan.io/tx/${live.paid.signature}`} target="_blank" rel="noopener">Receipt <ExternalLink size={13} /></a></div>
-              : <PayStatus key={qr.id} to={qr.to} amount={qr.amount} refKey={qr.ref} label={qr.label} message={qr.message} notify />; })()}
-            <p className="ax-fine">Scan with any Solana wallet. This screen confirms the moment it lands.</p>
-            <div className="ax-modal-row"><CopyIcon text={pageUrl(qr)} label="Copy link" /><span>{pageUrl(qr).replace(/^https?:\/\//, "").slice(0, 38)}…</span></div>
+      {newOpen && (
+        <Sheet label="New pay link" onClose={() => setNewOpen(false)}>
+          <div className="ax-det">
+            <p className="mono ax-det-top-c">New pay link</p>
+            <h2 className="ax-det-name">How much?</h2>
+            {quick(true)}
           </div>
-        </div>
+        </Sheet>
       )}
+      {detail && <LinkDetail key={detail.id} l={detail} pageUrl={pageUrl} onClose={() => setDetailId(null)} onCounter={openCounter} onDelete={remove} />}
+      {counterLive && <CounterMode link={counterLive} onClose={() => setCounter(null)} onNew={() => { setCounter(null); setNewOpen(true); }} />}
     </div>
   );
 }

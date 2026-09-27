@@ -9,6 +9,7 @@ class SoundEngine {
   master: GainNode | null = null;
   analyser: AnalyserNode | null = null;
   on = false;
+  want = false;
   last: Record<string, number> = {};
 
   private ensure() {
@@ -23,16 +24,21 @@ class SoundEngine {
     return ctx;
   }
 
-  async enable() {
+  async enable(quiet = false) {
+    this.want = true;
     const ctx = this.ensure();
     if (ctx.state === "suspended") await ctx.resume();
+    if (!this.want) return; // turned off while the browser was waking audio
     this.on = true;
+    savePref(true);
     this.master!.gain.cancelScheduledValues(ctx.currentTime);
     this.master!.gain.setTargetAtTime(0.9, ctx.currentTime, 0.15);
-    this.play("chime");
+    if (!quiet) this.play("chime");
   }
 
   disable() {
+    this.want = false;
+    savePref(false);
     if (!this.ctx || !this.master) { this.on = false; return; }
     this.play("tap");
     const t = this.ctx.currentTime;
@@ -87,6 +93,24 @@ class SoundEngine {
   levels(out: Uint8Array) { if (this.analyser) this.analyser.getByteFrequencyData(out as Parameters<AnalyserNode["getByteFrequencyData"]>[0]); }
 }
 
+const PREF = "qova-sound";
+function savePref(on: boolean) { try { localStorage.setItem(PREF, on ? "on" : "off"); } catch { /* ignore */ } }
+/** The saved choice, shared by the landing page and the app. Off unless the person turned it on. */
+export function soundPref(): boolean { try { return localStorage.getItem(PREF) === "on"; } catch { return false; } }
+
 let engine: SoundEngine | null = null;
 export function sound() { if (!engine) engine = new SoundEngine(); return engine; }
+
+/**
+ * Browsers only start audio after a tap. If the person turned sound on before,
+ * wake the engine quietly on their first tap or key press on this page.
+ */
+export function armSound() {
+  if (!soundPref() || sound().on) return () => {};
+  const go = () => { stop(); if (soundPref() && !sound().on) sound().enable(true).catch(() => {}); };
+  const stop = () => { window.removeEventListener("pointerdown", go, true); window.removeEventListener("keydown", go, true); };
+  window.addEventListener("pointerdown", go, true);
+  window.addEventListener("keydown", go, true);
+  return stop;
+}
 export type { Voice };

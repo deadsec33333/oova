@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { sound } from "@/lib/sound";
+import { armSound, sound, soundPref } from "@/lib/sound";
 
 const BARS = 5;
 
@@ -8,6 +8,13 @@ const BARS = 5;
 export default function SoundToggle() {
   const [on, setOn] = useState(false);
   const bars = useRef<(HTMLSpanElement | null)[]>([]);
+
+  // remember the choice across pages and visits
+  useEffect(() => {
+    if (!soundPref()) return;
+    setOn(true);
+    return armSound();
+  }, []);
 
   // wire UI sounds once
   useEffect(() => {
