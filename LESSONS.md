@@ -46,3 +46,13 @@
 ## Try next time
 1. Ask MoonPay for a Solana devnet USDC sandbox so the real checkout can be tested end to end.
 2. Put the region and limits answers behind a small cache from day one (done here: 10 min and 1 h).
+
+
+# Lessons: Coinflow (27 Sep 2026)
+## Great
+1. Reading the provider's OpenAPI file answered what the guides left vague (webhook events, totals fields, cart item types).
+2. A provider registry with one interface let Coinflow slot in next to MoonPay without touching the pay page logic or the Paid rule.
+## Weak
+1. Coinflow only finds a payment by its own id, so we must capture it from the first webhook or the return redirect.
+## Try next time
+1. Ask the provider for the exact callback parameters and webhook samples before building.
