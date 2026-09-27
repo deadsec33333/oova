@@ -16,7 +16,9 @@ export default function CardReturn({ order }: { order: string }) {
     const tick = async () => {
       if (document.visibilityState === "visible") {
         try {
-          const r = await fetch(`/api/pay/card/status?o=${encodeURIComponent(order)}`, { cache: "no-store" });
+          const sp = new URLSearchParams(location.search);
+          const pid = sp.get("paymentId") ?? sp.get("paymentid") ?? "";
+          const r = await fetch(`/api/pay/card/status?o=${encodeURIComponent(order)}${pid ? `&pid=${encodeURIComponent(pid)}` : ""}`, { cache: "no-store" });
           const j = (await r.json()) as S;
           if (j.status !== "slow_down") setS(j);
           if (["paid", "failed", "underpaid", "not_found"].includes(j.status)) done = true;
