@@ -55,12 +55,17 @@ function toTx(t: MpTx): ProviderTx {
 function sign(search: string) { return createHmac("sha256", sk()).update(search).digest("base64"); }
 
 export const moonpay: Onramp = {
+  id: "moonpay",
   name: "MoonPay",
+  fiats: ["usd", "eur", "gbp"],
+  needsEmail: false,
+  payerNote: "MoonPay handles your card and may ask for ID.",
   termsUrl: "https://www.moonpay.com/legal/terms_of_use",
   privacyUrl: "https://www.moonpay.com/legal/privacy_policy",
   configured: () => Boolean(pk() && sk() && whk()),
 
-  async region(ip: string): Promise<Region> {
+  async region(ip: string, country: string): Promise<Region> {
+    if (!ip) return { allowed: true, country, countryName: "" };
     const r = await get<{ alpha2?: string; country?: string; isBuyAllowed?: boolean; isAllowed?: boolean }>("/v3/ip_address", { ipAddress: ip });
     if (!r.ok || !r.json) throw new Error("provider_region");
     return { allowed: r.json.isBuyAllowed !== false && r.json.isAllowed !== false, country: r.json.alpha2 ?? "", countryName: r.json.country ?? "" };
@@ -76,7 +81,8 @@ export const moonpay: Onramp = {
     };
   },
 
-  async quote(amount: string, fiat: string): Promise<Quote> {
+  async quote(amount: string, fiat: string, _to: string): Promise<Quote> {
+    void _to;
     const r = await get<{ baseCurrencyAmount: number; quoteCurrencyAmount: number; feeAmount: number; networkFeeAmount: number; extraFeeAmount?: number; totalAmount: number; expiresAt?: string }>(
       `/v3/currencies/${MOONPAY_CURRENCY()}/buy_quote`, { baseCurrencyCode: fiat, quoteCurrencyAmount: amount, paymentMethod: "credit_debit_card", areFeesIncluded: "false" });
     if (!r.ok || !r.json || typeof r.json.totalAmount !== "number") throw new Error(r.status === 400 ? "provider_amount" : "provider_quote");
@@ -88,7 +94,7 @@ export const moonpay: Onramp = {
   },
 
   /** A signed checkout link with the receiver's wallet and the USDC amount set by us, not the payer. */
-  checkoutUrl({ orderId, wallet, amount, fiat, ip, returnUrl, theme }) {
+  async checkout({ orderId, wallet, amount, fiat, ip, returnUrl, theme }) {
     const p = new URLSearchParams();
     p.set("apiKey", pk());
     p.set("currencyCode", MOONPAY_CURRENCY()); // payer cannot switch coin
@@ -104,7 +110,7 @@ export const moonpay: Onramp = {
     return `${widgetBase()}${search}&signature=${encodeURIComponent(sign(search))}`;
   },
 
-  async fetchTx(orderId: string): Promise<ProviderTx | null> {
+  async fetchTx({ id: orderId }): Promise<ProviderTx | null> {
     const r = await get<MpTx | MpTx[]>(`/v1/transactions/ext/${encodeURIComponent(orderId)}`, {});
     if (r.status === 404) return null;
     if (!r.ok || !r.json) throw new Error("provider_status");
@@ -116,7 +122,8 @@ export const moonpay: Onramp = {
   },
 
   /** Moonpay-Signature-V2: t=<unix>,s=<hex HMAC SHA256 of "t.body" with the webhook key>. */
-  verifyWebhook(raw: string, header: string | null) {
+  verifyWebhook(raw: string, headers: Headers) {
+    const header = headers.get("moonpay-signature-v2");
     if (!header || !whk()) return null;
     const parts = Object.fromEntries(header.split(",").map((x) => { const i = x.indexOf("="); return [x.slice(0, i).trim(), x.slice(i + 1).trim()]; }));
     const t = Number(parts.t), s = parts.s ?? "";
