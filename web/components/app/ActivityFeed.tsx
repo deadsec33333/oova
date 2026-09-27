@@ -2,7 +2,7 @@
 import { useMemo } from "react";
 import { ArrowDownLeft, ChevronRight, ExternalLink, Link2 } from "lucide-react";
 import { displayAmount, shortAddress } from "@/lib/solanapay";
-import { Skel, dayLabel, linkName, paidAt, type LinkRec } from "./shared";
+import { Skel, byCard, dayLabel, linkName, paidAt, type LinkRec } from "./shared";
 
 type Ev = { kind: "made" | "paid"; t: number; l: LinkRec };
 const time = (ms: number) => new Date(ms).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
@@ -47,7 +47,7 @@ export default function ActivityFeed({ links, compact, onOpen, onAll }: { links:
                       <span className="ax-ev-ico">{e.kind === "paid" ? <ArrowDownLeft size={16} /> : <Link2 size={15} />}</span>
                       <span className="ax-ev-t">
                         <b>{e.kind === "paid" ? `+${displayAmount(e.l.amount)} USDC` : `Link made · ${displayAmount(e.l.amount)} USDC`}</b>
-                        <span>{e.kind === "paid" ? `${e.l.paid?.payer ? `From ${shortAddress(e.l.paid.payer)} · ` : ""}${linkName(e.l)}` : linkName(e.l)}</span>
+                        <span>{e.kind === "paid" ? `${byCard(e.l) ? "By card · " : e.l.paid?.payer ? `From ${shortAddress(e.l.paid.payer)} · ` : ""}${linkName(e.l)}` : linkName(e.l)}</span>
                       </span>
                       <span className="ax-ev-time mono">{time(e.t)}</span>
                     </button>

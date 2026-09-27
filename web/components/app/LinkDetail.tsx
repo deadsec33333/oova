@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import { Check, CircleDot, ExternalLink, Link2, LoaderCircle, Maximize2, Share2, Trash2 } from "lucide-react";
+import { Check, CircleDot, CreditCard, ExternalLink, Link2, LoaderCircle, Maximize2, Share2, Trash2 } from "lucide-react";
 import { displayAmount, shortAddress } from "@/lib/solanapay";
 import { StatusPill } from "./LinksList";
-import { CopyIcon, Sheet, fullDate, linkName, paidAt, shareLink, when, type LinkRec } from "./shared";
+import { CopyIcon, Sheet, byCard, cardInFlight, fullDate, linkName, paidAt, shareLink, when, type LinkRec } from "./shared";
 
 function Field({ k, v, copy, href }: { k: string; v: string; copy?: string; href?: string }) {
   return (
@@ -18,8 +18,31 @@ function Field({ k, v, copy, href }: { k: string; v: string; copy?: string; href
   );
 }
 
-export default function LinkDetail({ l, pageUrl, onClose, onCounter, onDelete }: {
-  l: LinkRec; pageUrl: (l: LinkRec) => string; onClose: () => void; onCounter: (l: LinkRec) => void; onDelete: (id: string) => Promise<boolean>;
+function CardSwitch({ l, onUpdate }: { l: LinkRec; onUpdate: (l: LinkRec) => void }) {
+  const on = l.card !== false;
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const flip = async () => {
+    setBusy(true); setErr("");
+    onUpdate({ ...l, card: !on });
+    try {
+      const r = await fetch(`/api/links/${l.id}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ card: !on }) });
+      if (!r.ok) throw new Error();
+      onUpdate(((await r.json()) as { link: LinkRec }).link);
+    } catch { onUpdate({ ...l, card: on }); setErr("Could not save. Try again."); }
+    finally { setBusy(false); }
+  };
+  return (
+    <div className="ax-switchrow">
+      <span className="ax-set-ico"><CreditCard size={16} /></span>
+      <div><b>Accept card payments</b><span>Payers can use a card, Apple Pay or Google Pay through MoonPay. You still get USDC in your wallet.</span>{err && <span className="ax-switch-err">{err}</span>}</div>
+      <button type="button" role="switch" aria-checked={on} aria-label="Accept card payments" className={`ax-switch${on ? " is-on" : ""}`} onClick={flip} disabled={busy}><i /></button>
+    </div>
+  );
+}
+
+export default function LinkDetail({ l, pageUrl, onClose, onCounter, onDelete, onUpdate }: {
+  l: LinkRec; pageUrl: (l: LinkRec) => string; onClose: () => void; onCounter: (l: LinkRec) => void; onDelete: (id: string) => Promise<boolean>; onUpdate: (l: LinkRec) => void;
 }) {
   const [sure, setSure] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -56,7 +79,9 @@ export default function LinkDetail({ l, pageUrl, onClose, onCounter, onDelete }:
         <ol className="ax-tl">
           <li className="is-done"><span className="ax-tl-dot"><Link2 size={12} /></span><div><b>Link made</b><span>{fullDate(l.createdAt)}</span></div></li>
           {paid ? (
-            <li className="is-done is-paid"><span className="ax-tl-dot"><Check size={12} strokeWidth={3} /></span><div><b>Paid · {displayAmount(l.amount)} USDC</b><span>{fullDate(paidAt(l))}{l.paid?.payer ? ` · from ${shortAddress(l.paid.payer)}` : ""}</span></div></li>
+            <li className="is-done is-paid"><span className="ax-tl-dot"><Check size={12} strokeWidth={3} /></span><div><b>{byCard(l) ? "Paid by card" : "Paid"} · {displayAmount(l.amount)} USDC</b><span>{fullDate(paidAt(l))}{byCard(l) ? ` · via ${l.paid?.provider ?? "MoonPay"}, confirmed on Solana` : l.paid?.payer ? ` · from ${shortAddress(l.paid.payer)}` : ""}</span></div></li>
+          ) : cardInFlight(l) ? (
+            <li className="is-now"><span className="ax-tl-dot"><CreditCard size={12} /></span><div><b>Card payment in progress</b><span>{cardInFlight(l)!.status === "processing" ? "MoonPay is sending the USDC. This can take a few minutes." : "A payer opened the card checkout."}</span></div></li>
           ) : (
             <li className="is-now"><span className="ax-tl-dot"><CircleDot size={12} /></span><div><b>Waiting for payment</b><span>Checked on Solana every 15 s while QOVA is open</span></div></li>
           )}
@@ -67,7 +92,9 @@ export default function LinkDetail({ l, pageUrl, onClose, onCounter, onDelete }:
             <h3 className="ax-det-h">Receipt</h3>
             <div className="ax-receipt">
               <div className="ax-receipt-top"><span className="mono">Received</span><b>{displayAmount(l.amount)} USDC</b></div>
-              <Field k="From" v={l.paid!.payer ? shortAddress(l.paid!.payer) : "Unknown"} copy={l.paid!.payer ?? undefined} href={l.paid!.payer ? `https://solscan.io/account/${l.paid!.payer}` : undefined} />
+              <Field k="Method" v={byCard(l) ? `Card via ${l.paid!.provider ?? "MoonPay"}` : "Solana wallet"} />
+              {byCard(l) ? <Field k="From" v={`${l.paid!.provider ?? "MoonPay"} for the card payer`} />
+                : <Field k="From" v={l.paid!.payer ? shortAddress(l.paid!.payer) : "Unknown"} copy={l.paid!.payer ?? undefined} href={l.paid!.payer ? `https://solscan.io/account/${l.paid!.payer}` : undefined} />}
               <Field k="To" v={shortAddress(l.to)} copy={l.to} />
               <Field k="Date" v={fullDate(paidAt(l))} />
               <Field k="Amount" v={l.paid!.exact ? "Exact amount" : "At least the amount asked"} />
@@ -75,13 +102,17 @@ export default function LinkDetail({ l, pageUrl, onClose, onCounter, onDelete }:
               <Field k="Transaction" v={shortAddress(l.paid!.signature)} copy={l.paid!.signature} href={`https://solscan.io/tx/${l.paid!.signature}`} />
               <Field k="Reference" v={shortAddress(l.ref)} copy={l.ref} />
             </div>
-            <p className="ax-fine">Paid wallet to wallet. QOVA never held this money.</p>
+            <p className="ax-fine">{byCard(l) ? `Card handled by ${l.paid!.provider ?? "MoonPay"}, USDC sent straight to your wallet. QOVA never held this money.` : "Paid wallet to wallet. QOVA never held this money."}</p>
           </>
         ) : (
+          <>
           <div className="ax-receipt ax-receipt-open">
             <Field k="Reference" v={shortAddress(l.ref)} copy={l.ref} />
             <p className="ax-fine">A random key in the link, so the payment can be found on Solana. It cannot move funds.</p>
           </div>
+          <h3 className="ax-det-h">Settings</h3>
+          <CardSwitch l={l} onUpdate={onUpdate} />
+          </>
         )}
 
         <button type="button" className={`ax-del${sure ? " is-sure" : ""}`} onClick={del} disabled={busy}>

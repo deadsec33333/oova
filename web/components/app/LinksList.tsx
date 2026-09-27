@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { ArrowDownWideNarrow, Check, ChevronRight, Link2, Maximize2, Plus, Search } from "lucide-react";
 import { Mark } from "@/components/Logo";
 import { shortAddress } from "@/lib/solanapay";
-import { Amount, CopyIcon, Skel, linkName, micro, paidAt, when, type LinkRec } from "./shared";
+import { Amount, CopyIcon, Skel, byCard, cardInFlight, linkName, micro, paidAt, when, type LinkRec } from "./shared";
 
 type F = "all" | "open" | "paid";
 
@@ -15,8 +15,8 @@ export function StatusPill({ l }: { l: LinkRec }) {
 
 export function LinkRow({ l, onOpen, onCounter, pageUrl }: { l: LinkRec; onOpen: (l: LinkRec) => void; onCounter: (l: LinkRec) => void; pageUrl: (l: LinkRec) => string }) {
   const meta = l.status === "paid"
-    ? `Paid ${when(paidAt(l))}${l.paid?.payer ? ` · from ${shortAddress(l.paid.payer)}` : ""}`
-    : `Made ${when(l.createdAt)}`;
+    ? byCard(l) ? `Paid by card ${when(paidAt(l))}` : `Paid ${when(paidAt(l))}${l.paid?.payer ? ` · from ${shortAddress(l.paid.payer)}` : ""}`
+    : cardInFlight(l) ? "Card payment in progress" : `Made ${when(l.createdAt)}`;
   return (
     <li className={`ax-row is-${l.status}`}>
       <button type="button" className="ax-row-main" onClick={() => onOpen(l)} aria-label={`${linkName(l)}, ${l.amount} USDC, ${l.status}. Open details`}>

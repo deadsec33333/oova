@@ -415,3 +415,19 @@ html[data-theme="dark"] .ax-tabbar { background: rgba(24,24,24,.86); }
   .ax-sheet-card, .ax-view, .ax-home > *, .ax-stack > * { animation: none; }
 }
 @media (max-width: 559px) { .ax-tools-r { flex-basis: 100%; } .ax-find { max-width: none; } .ax-chips { width: 100%; } .ax-chips button { flex: 1; justify-content: center; } }
+/* link settings switch */
+.ax-switchrow { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 18px; background: var(--mist); box-shadow: inset 0 0 0 1px var(--line); }
+html[data-theme="dark"] .ax-switchrow { background: #151515; box-shadow: inset 0 0 0 1px #242424; }
+.ax-switchrow > div { flex: 1; min-width: 0; display: grid; gap: 2px; line-height: 1.4; }
+.ax-switchrow b { font-weight: 500; font-size: 14.5px; }
+.ax-switchrow > div > span { font-size: 12.5px; color: var(--slate); }
+.ax-switchrow .ax-set-ico { background: var(--paper); }
+html[data-theme="dark"] .ax-switchrow .ax-set-ico { background: #0a0a0a; }
+.ax-switch-err { color: var(--ink) !important; }
+.ax-switch { position: relative; flex: none; width: 52px; height: 32px; padding: 0; border: 0; border-radius: 99px; background: color-mix(in srgb, var(--ink) 18%, transparent); cursor: pointer; transition: background .25s; }
+.ax-switch i { position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.25); transition: transform .3s var(--ease); }
+.ax-switch.is-on { background: var(--ink); }
+.ax-switch.is-on i { transform: translateX(20px); }
+html[data-theme="dark"] .ax-switch.is-on i { background: #0a0a0a; }
+.ax-switch:disabled { opacity: .7; }
+@media (pointer: coarse) { .ax-switch::after { content: ""; position: absolute; inset: -6px; } }

@@ -298,7 +298,7 @@ function Dashboard({ wallet, onOut }: { wallet: string; onOut: () => void }) {
           </div>
         </Sheet>
       )}
-      {detail && <LinkDetail key={detail.id} l={detail} pageUrl={pageUrl} onClose={() => setDetailId(null)} onCounter={openCounter} onDelete={remove} />}
+      {detail && <LinkDetail key={detail.id} l={detail} pageUrl={pageUrl} onClose={() => setDetailId(null)} onCounter={openCounter} onDelete={remove} onUpdate={(l) => setLinks((cur) => (cur ?? []).map((x) => (x.id === l.id ? l : x)))} />}
       {counterLive && <CounterMode link={counterLive} onClose={() => setCounter(null)} onNew={() => { setCounter(null); setNewOpen(true); }} />}
     </div>
   );

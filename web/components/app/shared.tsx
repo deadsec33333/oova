@@ -5,8 +5,13 @@ import { displayAmount } from "@/lib/solanapay";
 
 export type LinkRec = {
   id: string; to: string; amount: string; label: string; message: string; ref: string; createdAt: number; status: "open" | "paid";
-  paid?: { signature: string; payer: string | null; blockTime: number | null; exact: boolean };
+  card?: boolean;
+  cardOrders?: { id: string; status: string; at: number }[];
+  paid?: { signature: string; payer: string | null; blockTime: number | null; exact: boolean; method?: "wallet" | "card"; provider?: string; orderId?: string };
 };
+export const byCard = (l: LinkRec) => l.paid?.method === "card";
+/** A card checkout on this link that has not finished yet, if any. */
+export const cardInFlight = (l: LinkRec) => l.status === "open" ? (l.cardOrders ?? []).find((o) => ["pending", "processing"].includes(o.status) && Date.now() - o.at < 3 * 86400_000) : undefined;
 
 export const DAY = 86400_000;
 export const post = (url: string, body?: unknown) =>
