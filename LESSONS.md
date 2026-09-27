@@ -30,3 +30,19 @@
 ## Try next time
 1. Keep the harness in the repo (outside web/) so the next session does not rebuild it.
 2. Test counter mode on a real phone: Wake Lock, vibration and the ping need real hardware.
+
+
+# Lessons: card payments via MoonPay (27 Sep 2026)
+
+## Great
+1. Research before code found the real blocker early: most onramps' user terms say the payer must own the destination wallet. Get written approval for paying a recipient.
+2. Our own on chain check is the source of truth. Webhooks and provider status only tell us where to look.
+3. Building one step per commit (model, routes, detection, pay page, dashboard, tests) kept every step testable.
+
+## Weak
+1. A webhook can mark a link paid on the server, so the dashboard watcher that only checked open links never alerted. Alerts must also come from paid state changes, not only from our own polling.
+2. Rate limits bite test scripts that run twice in a minute. Space test runs or use different test IPs.
+
+## Try next time
+1. Ask MoonPay for a Solana devnet USDC sandbox so the real checkout can be tested end to end.
+2. Put the region and limits answers behind a small cache from day one (done here: 10 min and 1 h).
