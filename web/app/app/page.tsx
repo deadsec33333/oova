@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowDownLeft, ArrowLeft, Check, ChevronRight, Copy, ExternalLink, House, KeyRound, Link2, LoaderCircle, LogOut, Mail,
   Plus, QrCode, Search, Settings, ShieldCheck, Trash2, Wallet, WalletMinimal, X, Activity as ActivityIcon, Sparkles,
@@ -9,6 +9,7 @@ import TokenIcon from "@/components/TokenIcon";
 import ThemeToggle from "@/components/ThemeToggle";
 import Coin from "@/components/Coin";
 import QR from "@/components/QR";
+import PayStatus from "@/components/PayStatus";
 import { displayAmount, payPageUrl, shortAddress, solanaPayUrl } from "@/lib/solanapay";
 import { watchWallets, walletBrowseLinks, type FoundWallet } from "@/lib/wallets";
 import { signInError, signInWith, signOut as endSession, useAccount, type Phase } from "@/lib/account";
@@ -184,6 +185,8 @@ function Dashboard({ wallet, onOut }: { wallet: string; onOut: () => void }) {
   const [qr, setQr] = useState<LinkRec | null>(null);
   const [sure, setSure] = useState<string | null>(null);
   const [origin, setOrigin] = useState("");
+  const linksNow = useRef<LinkRec[] | null>(null);
+  linksNow.current = links;
 
   const load = useCallback(async () => {
     try {
@@ -198,9 +201,15 @@ function Dashboard({ wallet, onOut }: { wallet: string; onOut: () => void }) {
 
   // The site wide watcher checks open links on Solana; here we just reflect what it finds.
   useEffect(() => {
-    const onPaid = (e: Event) => {
-      const l = (e as CustomEvent<{ link?: LinkRec; ref: string }>).detail?.link;
-      if (l) setLinks((cur) => (cur ?? []).map((x) => (x.id === l.id ? l : x)));
+    const onPaid = async (e: Event) => {
+      const d = (e as CustomEvent<{ link?: LinkRec; ref: string }>).detail;
+      let l = d?.link;
+      if (!l && d?.ref) {
+        // Seen live on screen (QR open): have the server confirm and save it too.
+        const row = (linksNow.current ?? []).find((x) => x.ref === d.ref && x.status === "open");
+        if (row) { try { l = ((await (await post(`/api/links/${row.id}/check`)).json()) as { link?: LinkRec }).link; } catch { /* next round */ } }
+      }
+      if (l?.status === "paid") setLinks((cur) => (cur ?? []).map((x) => (x.id === l!.id ? l! : x)));
     };
     const reload = () => { load(); };
     window.addEventListener("qova:paid", onPaid);
@@ -381,7 +390,10 @@ function Dashboard({ wallet, onOut }: { wallet: string; onOut: () => void }) {
             <p className="mono">{qr.message || qr.label || "Pay link"}</p>
             <h3>{displayAmount(qr.amount)} <small>USDC</small></h3>
             <QR value={solanaPayUrl({ to: qr.to, amount: qr.amount, label: qr.label || undefined, message: qr.message || undefined, ref: qr.ref })} label="Scan with a Solana wallet to pay" />
-            <p className="ax-fine">Scan with any Solana wallet. Or share the link.</p>
+            {(() => { const live = all.find((x) => x.id === qr.id) ?? qr; return live.status === "paid" && live.paid
+              ? <div className="pst is-paid" role="status"><span className="pst-ico"><Check size={16} strokeWidth={3} /></span><div><b>Paid · {displayAmount(live.amount)} USDC received</b><span className="mono">confirmed on Solana</span></div><a href={`https://solscan.io/tx/${live.paid.signature}`} target="_blank" rel="noopener">Receipt <ExternalLink size={13} /></a></div>
+              : <PayStatus key={qr.id} to={qr.to} amount={qr.amount} refKey={qr.ref} label={qr.label} message={qr.message} notify />; })()}
+            <p className="ax-fine">Scan with any Solana wallet. This screen confirms the moment it lands.</p>
             <div className="ax-modal-row"><CopyIcon text={pageUrl(qr)} label="Copy link" /><span>{pageUrl(qr).replace(/^https?:\/\//, "").slice(0, 38)}…</span></div>
           </div>
         </div>

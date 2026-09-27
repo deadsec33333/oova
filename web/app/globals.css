@@ -1186,3 +1186,5 @@ html[data-theme="dark"] .qt-t span { color: rgba(0,0,0,.6); }
 html[data-theme="dark"] .qt-a { background: rgba(0,0,0,.08); color: #0a0a0a; }
 html[data-theme="dark"] .qt-x { color: rgba(0,0,0,.5); }
 @media (max-width: 480px) { .qt-a { display: none; } }
+.ax-modal-card .pst { margin-top: 14px; }
+.ax-modal-card .pst.is-paid { animation: axin .5s var(--ease) both; }

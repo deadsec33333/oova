@@ -124,3 +124,7 @@ A daylight fintech console. Mix of two references Aurimas picked: Stockcoin (chr
 - Fixed: dashboard "What is it for" was stored as the name shown on the pay page.
 - Tested end to end with a fake Solana node: make link, reload, payment lands, alert shows; connect imports device links; dashboard marks Paid; no repeat alert after reload.
 - Not yet: alerts while every QOVA tab is closed (needs Helius webhooks plus web push).
+
+## Backend 4 · live confirmation on the dashboard QR
+- The dashboard QR sheet had no live status, so paying by scanning it showed nothing until the 15 s watcher ran. It now shows Waiting, then Paid with receipt, checked every 3 s (confirmed in under 2 s in the test) and saved to the account.
+- The payer only sees their own wallet's confirmation after scanning, since a QR goes straight into the wallet app. The screen showing the QR is the confirmation.
