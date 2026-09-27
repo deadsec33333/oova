@@ -110,7 +110,7 @@ export default function AccountHost() {
             <span className="qt-ico"><Check size={18} strokeWidth={3} /></span>
             <div className="qt-t">
               <b>Paid · {displayAmount(t.amount)} USDC received</b>
-              <span>{t.message || t.label || "Pay link"}{t.payer ? ` · from ${shortAddress(t.payer)}` : ""}</span>
+              <span>{t.message || t.label || "Pay link"}{(t.link as { paid?: { method?: string } } | undefined)?.paid?.method === "card" ? " · paid by card" : t.payer ? ` · from ${shortAddress(t.payer)}` : ""}</span>
             </div>
             {t.signature && <a href={`https://solscan.io/tx/${t.signature}`} target="_blank" rel="noopener" className="qt-a">Receipt <ExternalLink size={12} /></a>}
             <button className="qt-x" aria-label="Dismiss" onClick={() => setToasts((x) => x.filter((y) => y.key !== t.key))}><X size={14} /></button>

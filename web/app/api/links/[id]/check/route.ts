@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { allow } from "@/lib/db";
 import { getLink, saveLink } from "@/lib/links";
+import { refreshLinkOrders } from "@/lib/onramp/orders";
 import { checkPayment } from "@/lib/paycheck";
 import { currentWallet, sameOrigin } from "@/lib/session";
 
@@ -12,15 +13,21 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const wallet = await currentWallet();
   if (!wallet) return NextResponse.json({ error: "signin" }, { status: 401 });
   const { id } = await params;
-  const link = await getLink(wallet, id);
+  let link = await getLink(wallet, id);
   if (!link) return NextResponse.json({ error: "not_found" }, { status: 404 });
   if (link.status === "paid") return NextResponse.json({ link });
   if (!(await allow(`check:${wallet}`, 90, 60))) return NextResponse.json({ link });
+  // Card checkouts in flight: ask the provider (webhook fallback) and confirm on Solana.
+  if (link.cardOrders?.length) {
+    await refreshLinkOrders(link);
+    link = (await getLink(wallet, id)) ?? link;
+    if (link.status === "paid") return NextResponse.json({ link }, { headers: { "cache-control": "no-store" } });
+  }
   try {
     const r = await checkPayment(link.to, link.amount, link.ref);
     if (r.status === "paid") {
       link.status = "paid";
-      link.paid = { signature: r.signature, payer: r.payer, blockTime: r.blockTime, exact: r.exact };
+      link.paid = { signature: r.signature, payer: r.payer, blockTime: r.blockTime, exact: r.exact, method: "wallet" };
       await saveLink(link, false);
     }
     return NextResponse.json({ link }, { headers: { "cache-control": "no-store" } });
