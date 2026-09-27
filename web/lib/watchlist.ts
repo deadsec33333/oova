@@ -10,6 +10,9 @@ export const watched = (): Watched[] => read<Watched[]>(KEY, []).filter((w) => D
 export function watch(w: Watched) { write(KEY, [w, ...watched().filter((x) => x.ref !== w.ref)].slice(0, 20)); }
 export function unwatch(ref: string) { write(KEY, watched().filter((x) => x.ref !== ref)); }
 
+/** Has this payment already alerted on this device? Read only. */
+export const alerted = (ref: string) => read<string[]>(DONE, []).includes(ref);
+
 /** True the first time a payment is seen on this device, so each one alerts once. */
 export function firstSeen(ref: string): boolean {
   const s = read<string[]>(DONE, []);

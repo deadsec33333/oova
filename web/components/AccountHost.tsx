@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Check, ChevronRight, ExternalLink, KeyRound, LoaderCircle, ShieldCheck, WalletMinimal, X } from "lucide-react";
 import { getAccount, loadAccount, signInError, signInWith, type Phase } from "@/lib/account";
 import { systemNotify } from "@/lib/notify";
-import { firstSeen, unwatch, watched } from "@/lib/watchlist";
+import { alerted, firstSeen, unwatch, watched } from "@/lib/watchlist";
 import { watchWallets, walletBrowseLinks, type FoundWallet } from "@/lib/wallets";
 import { displayAmount, shortAddress } from "@/lib/solanapay";
 
@@ -67,7 +67,12 @@ export default function AccountHost() {
           if (moved) window.dispatchEvent(new Event("qova:links"));
           const r = await fetch("/api/links", { cache: "no-store" });
           if (r.ok) {
-            const { links } = (await r.json()) as { links: { id: string; status: string; createdAt: number; ref: string; amount: string; label: string; message: string }[] };
+            const { links } = (await r.json()) as { links: { id: string; status: string; createdAt: number; ref: string; amount: string; label: string; message: string; paid?: { signature: string; payer: string | null; blockTime: number | null } }[] };
+            // Paid on the server while this tab was not the one watching (card payments confirmed by webhook, or another device).
+            for (const l of links) {
+              const t = l.paid?.blockTime ? l.paid.blockTime * 1000 : 0;
+              if (l.status === "paid" && t > Date.now() - 86400_000 && !alerted(l.ref)) paid({ ref: l.ref, amount: l.amount, label: l.label, message: l.message, signature: l.paid?.signature, payer: l.paid?.payer, link: l });
+            }
             const open = links.filter((l) => l.status === "open" && Date.now() - l.createdAt < 30 * 86400_000).slice(0, 8);
             for (const l of open) {
               const c = await post(`/api/links/${l.id}/check`);
