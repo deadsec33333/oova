@@ -56,6 +56,16 @@ async function destinationAuthKey(wallet: string): Promise<string> {
   return r.json.destinationAuthKey;
 }
 
+/** Our Coinflow merchant id: COINFLOW_MERCHANT_ID if set, otherwise read once from Coinflow with the API key. */
+async function merchantId(): Promise<string> {
+  if (merchant()) return merchant();
+  try { const hit = await redis<string | null>("GET", "cf:mid"); if (hit) return hit; } catch { /* no cache */ }
+  const r = await call<{ merchantId?: string }>("GET", "/merchant", { headers: { Authorization: key() } });
+  if (!r.ok || !r.json?.merchantId) throw new Error("provider_merchant");
+  try { await redis("SET", "cf:mid", r.json.merchantId, "EX", 86400); } catch { /* ignore */ }
+  return r.json.merchantId;
+}
+
 async function sessionKey(userId: string): Promise<string> {
   const k = `cf:sk:${userId}`;
   try { const hit = await redis<string | null>("GET", k); if (hit) return hit; } catch { /* no cache */ }
@@ -81,7 +91,7 @@ export const coinflow: Onramp = {
   fiats: ["usd"],
   needsEmail: true,
   payerNote: "A normal card payment. No crypto account needed.",
-  configured: () => Boolean(key() && merchant() && whk()),
+  configured: () => Boolean(key() && whk()),
 
   async region(_ip: string, country: string): Promise<Region> {
     void _ip;
@@ -108,7 +118,7 @@ export const coinflow: Onramp = {
   async quote(amount: string, fiat: string, to: string): Promise<Quote> {
     const sk = await sessionKey("qova-quote");
     const dak = await destinationAuthKey(to);
-    const r = await call<{ card?: TotalsBlock }>("POST", `/checkout/totals/${encodeURIComponent(merchant())}`, {
+    const r = await call<{ card?: TotalsBlock }>("POST", `/checkout/totals/${encodeURIComponent(await merchantId())}`, {
       headers: { "x-coinflow-auth-session-key": sk },
       body: { subtotal: { cents: toCents(amount), currency: "USD" }, settlementType: "USDC", destinationAuthKey: dak },
     });

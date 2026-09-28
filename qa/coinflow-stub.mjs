@@ -89,6 +89,10 @@ http.createServer(async (req, res) => {
     checkouts.set(id, { body: b, userId: req.headers["x-coinflow-auth-user-id"] });
     return send(res, 200, { link: `http://localhost:${PORT}/checkout/${id}` });
   }
+  if (p === "/api/merchant" && req.method === "GET") {
+    if (auth !== API_KEY) return send(res, 401, { message: "unauthorized" });
+    return send(res, 200, { merchantId: "qova-test" });
+  }
   const pm = p.match(/^\/api\/merchant\/payments\/([^/]+)$/);
   if (pm && req.method === "GET") {
     if (auth !== API_KEY) return send(res, 401, { message: "unauthorized" });
