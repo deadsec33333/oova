@@ -37,7 +37,13 @@ async function call<T>(method: "GET" | "POST", path: string, opts: { body?: unkn
       headers: { accept: "application/json", ...(opts.body ? { "content-type": "application/json" } : {}), ...opts.headers },
       body: opts.body ? JSON.stringify(opts.body) : undefined,
     });
-    return { ok: r.ok, status: r.status, json: (await r.json().catch(() => null)) as T | null };
+    const json = (await r.json().catch(() => null)) as T | null;
+    // Status and Coinflow's error text only (never keys, card or payer data) so failures can be traced in Vercel logs.
+    if (!r.ok) console.error(`[coinflow] ${method} ${path.replace(/\/[A-Za-z0-9_-]{16,}$/, "/:id")} -> ${r.status} ${JSON.stringify(json)?.slice(0, 300) ?? ""}`);
+    return { ok: r.ok, status: r.status, json };
+  } catch (e) {
+    console.error(`[coinflow] ${method} ${path} failed: ${(e as Error).message}`);
+    throw e;
   } finally { clearTimeout(t); }
 }
 

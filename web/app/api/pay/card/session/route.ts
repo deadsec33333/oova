@@ -36,7 +36,8 @@ export async function POST(req: Request) {
       returnUrl: `${origin}/pay/card?o=${order.id}`, theme: body.theme === "dark" ? "dark" : "light",
     });
     return NextResponse.json({ url, order: order.id }, { headers: noStore });
-  } catch {
+  } catch (e) {
+    console.error(`[card] ${onramp.id} checkout failed: ${(e as Error).message}`);
     return NextResponse.json({ error: "provider_down" }, { status: 502, headers: noStore });
   }
 }

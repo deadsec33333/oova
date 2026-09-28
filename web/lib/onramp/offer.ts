@@ -59,7 +59,8 @@ export async function cardOffer(p: { to: string; amount: string; ref: string; fi
     // Never offer a checkout that would deliver less than the link asks for.
     if (Number(quote.receiverGets) + 1e-9 < n) return { available: false, reason: "provider_amount", country, provider: onramp.name };
     return { available: true, link, provider: onramp.name, terms: onramp.termsUrl, privacy: onramp.privacyUrl, note: onramp.payerNote, needsEmail: onramp.needsEmail, fiats: onramp.fiats, country, fiat, quote, minUsdc: lim.minUsdc, maxUsdc: lim.maxUsdc };
-  } catch {
+  } catch (e) {
+    console.error(`[card] ${onramp.id} offer failed: ${(e as Error).message}`);
     return { available: false, reason: "provider_down", provider: onramp.name };
   }
 }
