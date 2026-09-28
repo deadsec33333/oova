@@ -2,7 +2,7 @@
 import { useMemo } from "react";
 import { ArrowDownLeft, ChevronRight, ExternalLink, Link2 } from "lucide-react";
 import { displayAmount, shortAddress } from "@/lib/solanapay";
-import { Skel, byCard, dayLabel, linkName, paidAt, type LinkRec } from "./shared";
+import { Skel, byCard, dayLabel, linkName, paidAt, txUrl, type LinkRec } from "./shared";
 
 type Ev = { kind: "made" | "paid"; t: number; l: LinkRec };
 const time = (ms: number) => new Date(ms).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
@@ -51,7 +51,7 @@ export default function ActivityFeed({ links, compact, onOpen, onAll }: { links:
                       </span>
                       <span className="ax-ev-time mono">{time(e.t)}</span>
                     </button>
-                    {e.kind === "paid" && e.l.paid && <a className="ax-ibtn" href={`https://solscan.io/tx/${e.l.paid.signature}`} target="_blank" rel="noreferrer" aria-label="View on Solscan" title="View on Solscan"><ExternalLink size={14} /></a>}
+                    {e.kind === "paid" && e.l.paid && <a className="ax-ibtn" href={txUrl(e.l.paid.signature, e.l.paid.network)} target="_blank" rel="noreferrer" aria-label="View on Solscan" title="View on Solscan"><ExternalLink size={14} /></a>}
                   </li>
                 ))}
               </ul>

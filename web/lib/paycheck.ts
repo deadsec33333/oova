@@ -1,5 +1,5 @@
 import "server-only";
-import { rpc } from "@/lib/rpc";
+import { rpc, type Network } from "@/lib/rpc";
 import { USDC_MINT } from "@/lib/solanapay";
 
 type Sig = { signature: string; err: unknown; blockTime: number | null };
@@ -10,7 +10,7 @@ export type PaidResult = { status: "paid"; signature: string; payer: string | nu
 export type CheckResult = PaidResult | { status: "pending" };
 
 const toRaw = (amt: string) => { const [i, f = ""] = amt.split("."); return BigInt(i) * 1_000_000n + BigInt((f + "000000").slice(0, 6)); };
-const bal = (list: TokBal[] | undefined, owner: string) => (list ?? []).filter((b) => b.mint === USDC_MINT && b.owner === owner).reduce((s, b) => s + BigInt(b.uiTokenAmount.amount), 0n);
+const bal = (list: TokBal[] | undefined, owner: string, mint = USDC_MINT) => (list ?? []).filter((b) => b.mint === mint && b.owner === owner).reduce((s, b) => s + BigInt(b.uiTokenAmount.amount), 0n);
 
 /**
  * Has this pay link been paid? Looks up the link's random reference key on Solana,
@@ -37,13 +37,17 @@ export async function checkPayment(to: string, amount: string, ref: string): Pro
  * sends the USDC and tells us the transaction id. Read only. "retry" when the RPC could not answer,
  * null when the transaction is not visible (or failed) on chain yet.
  */
-export async function verifyTransfer(signature: string, to: string): Promise<{ received: bigint; blockTime: number | null } | null | "retry"> {
+/** Circle's USDC on Solana devnet, used only by provider sandboxes. */
+export const USDC_MINT_DEVNET = "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
+
+export async function verifyTransfer(signature: string, to: string, network: Network = "mainnet"): Promise<{ received: bigint; blockTime: number | null } | null | "retry"> {
+  const mint = network === "devnet" ? USDC_MINT_DEVNET : USDC_MINT;
   if (!/^[1-9A-HJ-NP-Za-km-z]{32,100}$/.test(signature)) return null;
   let tx: Tx | null;
   try {
-    tx = await rpc<Tx | null>("getTransaction", [signature, { encoding: "jsonParsed", commitment: "confirmed", maxSupportedTransactionVersion: 0 }]);
+    tx = await rpc<Tx | null>("getTransaction", [signature, { encoding: "jsonParsed", commitment: "confirmed", maxSupportedTransactionVersion: 0 }], network);
   } catch { return "retry"; }
   if (!tx?.meta || tx.meta.err) return null;
-  const received = bal(tx.meta.postTokenBalances, to) - bal(tx.meta.preTokenBalances, to);
+  const received = bal(tx.meta.postTokenBalances, to, mint) - bal(tx.meta.preTokenBalances, to, mint);
   return received > 0n ? { received, blockTime: tx.blockTime } : null;
 }

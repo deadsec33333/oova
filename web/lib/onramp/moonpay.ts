@@ -57,6 +57,7 @@ function sign(search: string) { return createHmac("sha256", sk()).update(search)
 export const moonpay: Onramp = {
   id: "moonpay",
   name: "MoonPay",
+  network: () => "mainnet",
   fiats: ["usd", "eur", "gbp"],
   needsEmail: false,
   payerNote: "MoonPay handles your card and may ask for ID.",

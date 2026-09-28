@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Check, CircleDot, CreditCard, ExternalLink, Link2, LoaderCircle, Maximize2, Share2, Trash2 } from "lucide-react";
 import { displayAmount, shortAddress } from "@/lib/solanapay";
 import { StatusPill } from "./LinksList";
-import { CopyIcon, Sheet, byCard, cardInFlight, fullDate, linkName, paidAt, shareLink, when, type LinkRec } from "./shared";
+import { CopyIcon, Sheet, byCard, cardInFlight, fullDate, linkName, paidAt, shareLink, txUrl, when, type LinkRec } from "./shared";
 
 function Field({ k, v, copy, href }: { k: string; v: string; copy?: string; href?: string }) {
   return (
@@ -99,7 +99,7 @@ export default function LinkDetail({ l, pageUrl, onClose, onCounter, onDelete, o
               <Field k="Date" v={fullDate(paidAt(l))} />
               <Field k="Amount" v={l.paid!.exact ? "Exact amount" : "At least the amount asked"} />
               <Field k="Network" v="Solana · USDC" />
-              <Field k="Transaction" v={shortAddress(l.paid!.signature)} copy={l.paid!.signature} href={`https://solscan.io/tx/${l.paid!.signature}`} />
+              <Field k="Transaction" v={shortAddress(l.paid!.signature)} copy={l.paid!.signature} href={txUrl(l.paid!.signature, l.paid!.network)} />
               <Field k="Reference" v={shortAddress(l.ref)} copy={l.ref} />
             </div>
             <p className="ax-fine">{byCard(l) ? `Card handled by ${l.paid!.provider ?? "MoonPay"}, USDC sent straight to your wallet. QOVA never held this money.` : "Paid wallet to wallet. QOVA never held this money."}</p>

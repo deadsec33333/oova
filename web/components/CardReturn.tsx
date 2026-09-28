@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { AlertCircle, ArrowLeft, Check, Clock, ExternalLink, LoaderCircle } from "lucide-react";
 import { displayAmount, shortAddress } from "@/lib/solanapay";
 
-type S = { status: "created" | "pending" | "processing" | "paid" | "failed" | "underpaid" | "not_found" | "slow_down"; amount?: string; to?: string; provider?: string; txHash?: string | null; received?: string | null; failure?: string | null };
+type S = { network?: string; status: "created" | "pending" | "processing" | "paid" | "failed" | "underpaid" | "not_found" | "slow_down"; amount?: string; to?: string; provider?: string; txHash?: string | null; received?: string | null; failure?: string | null };
 
 /** Pending, processing and paid states for a card checkout. Polls our server, which confirms on Solana. */
 export default function CardReturn({ order }: { order: string }) {
@@ -46,7 +46,7 @@ export default function CardReturn({ order }: { order: string }) {
       <p className="mono cr-k">Paid by card</p>
       <h1 className="cr-h">{amt} arrived</h1>
       <p className="cr-p">It is in the receiver&rsquo;s wallet ({to}), confirmed on Solana.</p>
-      {s.txHash && <a className="btn btn-chrome btn-wide" href={`https://solscan.io/tx/${s.txHash}`} target="_blank" rel="noreferrer">Receipt on Solscan <ExternalLink size={15} /></a>}
+      {s.txHash && <a className="btn btn-chrome btn-wide" href={`https://solscan.io/tx/${s.txHash}${s.network === "devnet" ? "?cluster=devnet" : ""}`} target="_blank" rel="noreferrer">Receipt on Solscan <ExternalLink size={15} /></a>}
       <p className="fine center">Your card receipt comes from {p} by email.</p>
     </div>
   );
@@ -65,7 +65,7 @@ export default function CardReturn({ order }: { order: string }) {
       <span className="cr-ico"><AlertCircle size={22} /></span>
       <h1 className="cr-h">Less USDC arrived than asked</h1>
       <p className="cr-p">{s.received} of {s.amount} USDC reached the receiver. The link stays open. Contact {p} support with your receipt.</p>
-      {s.txHash && <a className="btn btn-outline btn-wide" href={`https://solscan.io/tx/${s.txHash}`} target="_blank" rel="noreferrer">See the transfer <ExternalLink size={15} /></a>}
+      {s.txHash && <a className="btn btn-outline btn-wide" href={`https://solscan.io/tx/${s.txHash}${s.network === "devnet" ? "?cluster=devnet" : ""}`} target="_blank" rel="noreferrer">See the transfer <ExternalLink size={15} /></a>}
     </div>
   );
 

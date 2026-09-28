@@ -105,8 +105,12 @@ for (const theme of ["light", "dark"]) {
   const lb = (await api(bp, "/api/links", { amount: "25", message: "No ATA" })).json.link;
   const { ctx, p } = await payer("light", "PH");
   await p.goto(payUrl(lb), { waitUntil: "networkidle" }); await p.getByRole("tab", { name: /Card or Apple Pay/ }).click(); await p.waitForTimeout(600);
-  const t = await p.locator(".po-off").innerText();
-  ok("receiver without USDC account explained", t.includes("not set up for USDC"), t.replace(/\n/g, " | "));
+  if (process.env.CF_SANDBOX) {
+    ok("sandbox: no USDC account check, quote shown (devnet)", (await p.locator(".po-quote").count()) === 1);
+  } else {
+    const t = await p.locator(".po-off").innerText();
+    ok("receiver without USDC account explained", t.includes("not set up for USDC"), t.replace(/\n/g, " | "));
+  }
   await p.screenshot({ path: `${out}/pay-card-no-usdc-390.png` });
   await ctx.close(); await bctx.close();
 }

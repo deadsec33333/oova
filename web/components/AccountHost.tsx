@@ -67,7 +67,7 @@ export default function AccountHost() {
           if (moved) window.dispatchEvent(new Event("qova:links"));
           const r = await fetch("/api/links", { cache: "no-store" });
           if (r.ok) {
-            const { links } = (await r.json()) as { links: { id: string; status: string; createdAt: number; ref: string; amount: string; label: string; message: string; paid?: { signature: string; payer: string | null; blockTime: number | null } }[] };
+            const { links } = (await r.json()) as { links: { id: string; status: string; createdAt: number; ref: string; amount: string; label: string; message: string; paid?: { signature: string; payer: string | null; blockTime: number | null; network?: string } }[] };
             // Paid on the server while this tab was not the one watching (card payments confirmed by webhook, or another device).
             for (const l of links) {
               const t = l.paid?.blockTime ? l.paid.blockTime * 1000 : 0;
@@ -117,7 +117,7 @@ export default function AccountHost() {
               <b>Paid · {displayAmount(t.amount)} USDC received</b>
               <span>{t.message || t.label || "Pay link"}{(t.link as { paid?: { method?: string } } | undefined)?.paid?.method === "card" ? " · paid by card" : t.payer ? ` · from ${shortAddress(t.payer)}` : ""}</span>
             </div>
-            {t.signature && <a href={`https://solscan.io/tx/${t.signature}`} target="_blank" rel="noopener" className="qt-a">Receipt <ExternalLink size={12} /></a>}
+            {t.signature && <a href={`https://solscan.io/tx/${t.signature}${(t.link as { paid?: { network?: string } } | undefined)?.paid?.network === "devnet" ? "?cluster=devnet" : ""}`} target="_blank" rel="noopener" className="qt-a">Receipt <ExternalLink size={12} /></a>}
             <button className="qt-x" aria-label="Dismiss" onClick={() => setToasts((x) => x.filter((y) => y.key !== t.key))}><X size={14} /></button>
           </div>
         ))}

@@ -55,7 +55,8 @@ export async function applyProviderTx(o: CardOrder, tx: ProviderTx): Promise<Car
   if (tx.wallet && tx.wallet !== o.to) { o.status = "failed"; o.failure = "Sent to a different wallet"; }
   else if (tx.status === "failed") { o.status = "failed"; o.failure = tx.failure || "The card payment did not go through"; }
   else if (tx.status === "completed" && tx.txHash) {
-    const v = await verifyTransfer(tx.txHash, o.to);
+    const network = providerOf(o.provider).network();
+    const v = await verifyTransfer(tx.txHash, o.to, network);
     if (v === "retry") { o.status = "processing"; }
     else if (v === null) { o.status = "processing"; o.failure = undefined; } // not visible on chain yet
     else {
@@ -69,7 +70,7 @@ export async function applyProviderTx(o: CardOrder, tx: ProviderTx): Promise<Car
         const l = await getLinkById(o.linkId);
         if (l && l.to === o.to && l.status !== "paid") {
           l.status = "paid";
-          l.paid = { signature: tx.txHash, payer: null, blockTime: v.blockTime, exact: v.received === want, method: "card", provider: providerOf(o.provider).name, orderId: o.id };
+          l.paid = { signature: tx.txHash, payer: null, blockTime: v.blockTime, exact: v.received === want, method: "card", provider: providerOf(o.provider).name, orderId: o.id, ...(network === "devnet" ? { network } : {}) };
           await noteOnLink(l, o);
           await saveOrder(o);
           return o;

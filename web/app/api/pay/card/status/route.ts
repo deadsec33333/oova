@@ -20,6 +20,6 @@ export async function GET(req: Request) {
   o = await refreshOrder(o);
   return NextResponse.json({
     status: o.status, amount: o.amount, to: o.to, provider: providerOf(o.provider).name, fiat: o.fiat,
-    txHash: o.txHash ?? null, received: o.received ?? null, failure: o.failure ?? null, updatedAt: o.updatedAt,
+    txHash: o.txHash ?? null, network: providerOf(o.provider).network(), received: o.received ?? null, failure: o.failure ?? null, updatedAt: o.updatedAt,
   }, { headers: { "cache-control": "no-store" } });
 }

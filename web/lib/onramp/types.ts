@@ -21,6 +21,8 @@ export type ProviderId = "moonpay" | "coinflow";
 export type Onramp = {
   id: ProviderId;
   name: string;
+  /** Where the provider delivers USDC right now: devnet in sandboxes that settle test USDC. */
+  network: () => "mainnet" | "devnet";
   termsUrl: string;
   privacyUrl: string;
   /** Fiat currencies the payer can pick. */

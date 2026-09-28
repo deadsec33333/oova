@@ -1,8 +1,11 @@
 /** Minimal Solana JSON-RPC client. Server only: the key lives in SOLANA_RPC and never reaches the browser. */
 import "server-only";
 
-export async function rpc<T>(method: string, params: unknown[]): Promise<T> {
-  const url = process.env.SOLANA_RPC;
+export type Network = "mainnet" | "devnet";
+
+/** Devnet is only used for provider sandboxes (test money). SOLANA_RPC_DEVNET overrides the public endpoint. */
+export async function rpc<T>(method: string, params: unknown[], network: Network = "mainnet"): Promise<T> {
+  const url = network === "devnet" ? process.env.SOLANA_RPC_DEVNET || "https://api.devnet.solana.com" : process.env.SOLANA_RPC;
   if (!url) throw new Error("rpc_not_configured");
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), 8000);

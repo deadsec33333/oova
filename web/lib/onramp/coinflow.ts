@@ -86,6 +86,7 @@ type Packet = { eventType?: string; created?: string; data?: { id?: string; paym
 export const coinflow: Onramp = {
   id: "coinflow",
   name: "Coinflow",
+  network: () => (prod() ? "mainnet" : "devnet"),
   termsUrl: "https://coinflow.cash/legal/terms-of-service",
   privacyUrl: "https://coinflow.cash/legal/privacy-policy",
   fiats: ["usd"],
@@ -107,6 +108,8 @@ export const coinflow: Onramp = {
   async precheck({ amount, to }) {
     if (!/^\d+(\.\d{1,2})?$/.test(amount)) return "cents"; // card amounts are whole cents
     // Coinflow sends USDC to the wallet's USDC account, which must already exist.
+    // Sandbox settles test USDC on devnet, where most wallets have no account yet: let Coinflow try.
+    if (!prod()) return null;
     const k = `cf:ata:${to}`;
     try { if (await redis<string | null>("GET", k)) return null; } catch { /* no cache */ }
     const r = await rpc<{ value: unknown[] }>("getTokenAccountsByOwner", [to, { mint: USDC_MINT }, { encoding: "jsonParsed", commitment: "confirmed" }]);

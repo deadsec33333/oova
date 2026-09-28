@@ -2,6 +2,7 @@
 import http from "node:http";
 
 const USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+const USDC_DEV = "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"; // test only: the stand in chain answers for both mints
 const kv = new Map(); // key -> {v, exp}
 const lists = new Map();
 const hashes = new Map();
@@ -62,7 +63,7 @@ http.createServer(async (req, res) => {
   if (method === "getSignaturesForAddress") return out(pays.filter((p) => p.ref === params[0]).map((p) => ({ signature: p.sig, err: null, blockTime: p.blockTime })));
   if (method === "getTransaction") {
     const p = pays.find((x) => x.sig === params[0]); if (!p) return out(null);
-    return out({ blockTime: p.blockTime, meta: { err: null, preTokenBalances: [{ mint: USDC, owner: p.to, uiTokenAmount: { amount: "0" } }], postTokenBalances: [{ mint: USDC, owner: p.to, uiTokenAmount: { amount: String(p.raw) } }] }, transaction: { message: { accountKeys: [{ pubkey: p.payer, signer: true }] } } });
+    return out({ blockTime: p.blockTime, meta: { err: null, preTokenBalances: [USDC, USDC_DEV].map((mint) => ({ mint, owner: p.to, uiTokenAmount: { amount: "0" } })), postTokenBalances: [USDC, USDC_DEV].map((mint) => ({ mint, owner: p.to, uiTokenAmount: { amount: String(p.raw) } })) }, transaction: { message: { accountKeys: [{ pubkey: p.payer, signer: true }] } } });
   }
   if (method === "getTokenAccountsByOwner") {
     rpcCalls.getTokenAccountsByOwner++;

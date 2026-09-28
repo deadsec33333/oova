@@ -15,6 +15,8 @@ export type LinkRec = {
   paid?: {
     signature: string; payer: string | null; blockTime: number | null; exact: boolean;
     method?: PayMethod; provider?: string; orderId?: string;
+    /** Only set for sandbox test payments on devnet. */
+    network?: "devnet";
   };
 };
 
