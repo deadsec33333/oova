@@ -35,7 +35,7 @@ function CardSwitch({ l, onUpdate }: { l: LinkRec; onUpdate: (l: LinkRec) => voi
   return (
     <div className="ax-switchrow">
       <span className="ax-set-ico"><CreditCard size={16} /></span>
-      <div><b>Accept card payments</b><span>Payers can use a card, Apple Pay or Google Pay through MoonPay. You still get USDC in your wallet.</span>{err && <span className="ax-switch-err">{err}</span>}</div>
+      <div><b>Accept card payments</b><span>Payers can use a card, Apple Pay or Google Pay. A licensed card provider handles the card and sends USDC straight to your wallet.</span>{err && <span className="ax-switch-err">{err}</span>}</div>
       <button type="button" role="switch" aria-checked={on} aria-label="Accept card payments" className={`ax-switch${on ? " is-on" : ""}`} onClick={flip} disabled={busy}><i /></button>
     </div>
   );
@@ -81,7 +81,7 @@ export default function LinkDetail({ l, pageUrl, onClose, onCounter, onDelete, o
           {paid ? (
             <li className="is-done is-paid"><span className="ax-tl-dot"><Check size={12} strokeWidth={3} /></span><div><b>{byCard(l) ? "Paid by card" : "Paid"} · {displayAmount(l.amount)} USDC</b><span>{fullDate(paidAt(l))}{byCard(l) ? ` · via ${l.paid?.provider ?? "MoonPay"}, confirmed on Solana` : l.paid?.payer ? ` · from ${shortAddress(l.paid.payer)}` : ""}</span></div></li>
           ) : cardInFlight(l) ? (
-            <li className="is-now"><span className="ax-tl-dot"><CreditCard size={12} /></span><div><b>Card payment in progress</b><span>{cardInFlight(l)!.status === "processing" ? "MoonPay is sending the USDC. This can take a few minutes." : "A payer opened the card checkout."}</span></div></li>
+            <li className="is-now"><span className="ax-tl-dot"><CreditCard size={12} /></span><div><b>Card payment in progress</b><span>{cardInFlight(l)!.status === "processing" ? "The card provider is sending the USDC. This can take a few minutes." : "A payer opened the card checkout."}</span></div></li>
           ) : (
             <li className="is-now"><span className="ax-tl-dot"><CircleDot size={12} /></span><div><b>Waiting for payment</b><span>Checked on Solana every 15 s while QOVA is open</span></div></li>
           )}
