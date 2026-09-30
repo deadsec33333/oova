@@ -13,3 +13,4 @@ A memecoin concept and a free pay link demo: someone sends you a link, anyone pa
 | `LESSONS.md` | What worked, what to fix |
 
 Part of the memecoin portfolio. Never commit keys, seed phrases or `.env` files.
+# oova
