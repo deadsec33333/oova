@@ -56,7 +56,11 @@ export default function PayOptions({ to, amount, refKey, children }: { to: strin
     return () => clearInterval(t);
   }, [mode, q?.available, fiat, load]);
 
-  const hidden = !refKey || q === null || (!q.available && (q.reason === "off_platform" || q.reason === "invalid"));
+  // Preview mode: the card partner is not connected (or the link is not saved), so the Apple Pay tab
+  // is shown as a preview. Pressing the button never charges anything; it points the payer to the wallet.
+  const preview = !refKey || (q !== null && !q.available && (q.reason === "off_platform" || q.reason === "invalid"));
+  const hidden = !preview && q === null;
+  const [soon, setSoon] = useState(false);
 
   async function go() {
     setErr(""); setGoing(true);
@@ -79,7 +83,31 @@ export default function PayOptions({ to, amount, refKey, children }: { to: strin
         </div>
       )}
 
-      {mode === "wallet" || hidden ? <div className="po-wallet">{children}</div> : (
+      {mode === "wallet" || hidden ? <div className="po-wallet">{children}</div> : preview ? (
+        <div className="po-card" role="tabpanel">
+          <p className="po-h">Pay with Apple Pay, Google Pay or card</p>
+          <p className="po-sub">No crypto account needed. The receiver gets USDC in their wallet.</p>
+          <div className="po-quote">
+            <div className="po-row po-big"><span>Receiver gets</span><b>{displayAmount(amount)} USDC</b></div>
+            <div className="po-sep" />
+            <div className="po-row"><span>QOVA fee</span><span>$0.00</span></div>
+            <div className="po-foot"><span>Card partner fees are shown before you confirm.</span></div>
+          </div>
+          {!soon ? (
+            <button className="po-apple" onClick={() => setSoon(true)} aria-label="Pay with Apple Pay">
+              <svg viewBox="0 0 17 20" width="15" height="18" aria-hidden="true"><path fill="currentColor" d="M14.1 10.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9C3.6 4.7 2 5.8 1.1 7.4c-1.8 3.2-.5 7.9 1.3 10.5.9 1.3 1.9 2.7 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.6 1-1.5 1.4-2.9 1.4-3-.1 0-2.7-1-2.7-4.3zM11.5 3c.7-.9 1.2-2 1.1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.1.1 2.3-.6 3-1.5z"/></svg>
+              <span>Pay</span>
+            </button>
+          ) : (
+            <div className="po-off" role="alert">
+              <b>Apple Pay opens soon</b>
+              <p>Nothing was charged. Card and Apple Pay payments are not switched on yet. Pay with a Solana wallet for now.</p>
+              <button className="btn btn-outline btn-sm" onClick={() => { setSoon(false); setMode("wallet"); }}>Pay with a Solana wallet</button>
+            </div>
+          )}
+          <div className="po-note"><p>Card and Apple Pay are handled by a licensed partner. QOVA never sees your card and never holds the money. $QOVA is a memecoin, not a dollar.</p></div>
+        </div>
+      ) : (
         <div className="po-card" role="tabpanel">
           {!q ? null : !q.available ? (
             <div className="po-off"><b>Card payment is not available</b><p>{why(q)}</p><button className="btn btn-outline btn-sm" onClick={() => setMode("wallet")}>Pay with a Solana wallet</button></div>
