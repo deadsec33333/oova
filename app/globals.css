@@ -1150,7 +1150,8 @@ html[data-theme="dark"] .po-email input { background: #0f0f0f; border-color: #2a
 .po-apple svg { margin-top: -3px; }
 html[data-theme="dark"] .po-apple { background: #fff; color: #000; }
 
-.hero-ca { display: flex; align-items: center; gap: 10px; max-width: 520px; margin-top: 18px; padding: 8px 8px 8px 12px; border-radius: 16px; background: color-mix(in srgb, var(--paper) 80%, transparent); box-shadow: inset 0 0 0 1px var(--line); backdrop-filter: blur(8px); }
+.ca-band { display: flex; justify-content: center; padding-top: 28px; padding-bottom: 8px; }
+.hero-ca { display: flex; align-items: center; gap: 10px; width: 100%; max-width: 560px; padding: 8px 8px 8px 12px; border-radius: 16px; background: color-mix(in srgb, var(--paper) 80%, transparent); box-shadow: inset 0 0 0 1px var(--line); backdrop-filter: blur(8px); }
 .hero-ca-k { font-size: 11px; letter-spacing: .1em; color: var(--slate); }
 .hero-ca-v { flex: 1; min-width: 0; font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hero-ca .btn { flex: none; }

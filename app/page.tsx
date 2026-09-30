@@ -58,21 +58,6 @@ export default function Home() {
               <Btn href="#make" size="lg">Make your pay link</Btn>
               <Btn href="#how" variant="outline" size="lg">Watch it work</Btn>
             </div>
-            <div className="hero-ca" data-intro>
-              <TokenIcon kind="qova" size={22} />
-              <span className="mono hero-ca-k">CA</span>
-              {launch.live ? (
-                <>
-                  <span className="mono hero-ca-v" title={launch.ca}>{launch.ca}</span>
-                  <CopyButton text={launch.ca} label="Copy" className="btn btn-outline btn-sm" />
-                </>
-              ) : (
-                <>
-                  <span className="mono hero-ca-v muted">Coming soon</span>
-                  <button className="btn btn-outline btn-sm" disabled>Copy</button>
-                </>
-              )}
-            </div>
 
             <div className="hero-visual" data-intro>
               <div className="orbit" aria-hidden="true" />
@@ -95,6 +80,24 @@ export default function Home() {
           <div><span className="mono num">02</span><p><b>QOVA never holds your money.</b> Wallet to wallet, always.</p></div>
           <div><span className="mono num">03</span><p><b>$QOVA is a meme,</b> not a dollar. Its price moves.</p></div>
         </section>
+
+        <div className="wrap ca-band">
+              <div className="hero-ca" data-fade>
+                <TokenIcon kind="qova" size={22} />
+                <span className="mono hero-ca-k">CA</span>
+                {launch.live ? (
+                  <>
+                    <span className="mono hero-ca-v" title={launch.ca}>{launch.ca}</span>
+                    <CopyButton text={launch.ca} label="Copy" className="btn btn-outline btn-sm" />
+                  </>
+                ) : (
+                  <>
+                    <span className="mono hero-ca-v muted">Coming soon</span>
+                    <button className="btn btn-outline btn-sm" disabled>Copy</button>
+                  </>
+                )}
+              </div>
+        </div>
 
         {/* STORY */}
         <Story />
