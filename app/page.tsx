@@ -58,6 +58,21 @@ export default function Home() {
               <Btn href="#make" size="lg">Make your pay link</Btn>
               <Btn href="#how" variant="outline" size="lg">Watch it work</Btn>
             </div>
+            <div className="hero-ca" data-intro>
+              <TokenIcon kind="qova" size={22} />
+              <span className="mono hero-ca-k">CA</span>
+              {launch.live ? (
+                <>
+                  <span className="mono hero-ca-v" title={launch.ca}>{launch.ca}</span>
+                  <CopyButton text={launch.ca} label="Copy" className="btn btn-outline btn-sm" />
+                </>
+              ) : (
+                <>
+                  <span className="mono hero-ca-v muted">Coming soon</span>
+                  <button className="btn btn-outline btn-sm" disabled>Copy</button>
+                </>
+              )}
+            </div>
 
             <div className="hero-visual" data-intro>
               <div className="orbit" aria-hidden="true" />
