@@ -256,6 +256,15 @@ export default function Home() {
             <div><span className="mono">Social</span><span className="muted-soon">X · soon</span><span className="muted-soon">Telegram · soon</span><span className="muted-soon">TikTok · soon</span></div>
           </div>
           <p className="disclaimer" id="risk"><b>Risk disclosure.</b> $QOVA is a memecoin with no intrinsic value and no expectation of profit. It is not a dollar or a stablecoin and its price can go to zero. QOVA pay links are a free, non custodial demo: payments go straight between wallets and QOVA never holds, moves or converts money. USDC is issued by Circle, not by QOVA. Check the rules where you live. Not financial advice.</p>
+          <p className="foot-ca mono">
+            <span className="foot-ca-k">CA</span>
+            {launch.live ? (
+              <>
+                <span className="foot-ca-v">{launch.ca}</span>
+                <CopyButton text={launch.ca} label="Copy" className="foot-ca-copy" />
+              </>
+            ) : <span className="foot-ca-v">coming soon</span>}
+          </p>
           <p className="foot-base mono"><span>© 2026 QOVA</span><span>Not a bank. Not a wallet. A link.</span></p>
         </div>
         <div className="foot-word" aria-hidden="true">QOVA</div>
