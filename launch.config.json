@@ -1,6 +1,23 @@
 {
   "_read_me": "PUBLIC FILE. Only addresses and links. Never a private key, seed phrase or password. Empty values keep that part of the site in preview mode.",
-  "token": { "ca": "", "symbol": "QOVA", "decimals": 6, "launchpad": "pump.fun", "pair": "", "launchedAt": "" },
-  "wallets": { "dev": "", "prizes": "" },
-  "links": { "x": "", "caPinnedOnX": false, "telegram": "", "discord": "", "tiktok": "", "instagram": "" }
+  "token": {
+    "ca": "72ck5UA5EqyvEG1KP8zPzLaUb9AJYDJwHm2u2LJ3pump",
+    "symbol": "QOVA",
+    "decimals": 6,
+    "launchpad": "pump.fun",
+    "pair": "",
+    "launchedAt": ""
+  },
+  "wallets": {
+    "dev": "",
+    "prizes": ""
+  },
+  "links": {
+    "x": "",
+    "caPinnedOnX": false,
+    "telegram": "",
+    "discord": "",
+    "tiktok": "",
+    "instagram": ""
+  }
 }
