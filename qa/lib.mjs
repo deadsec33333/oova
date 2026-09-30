@@ -1,6 +1,6 @@
 import { createRequire } from "node:module";
 import crypto from "node:crypto";
-const require = createRequire("/home/claude/q/web/package.json");
+const require = createRequire("/home/claude/q/package.json");
 const bs58 = require("bs58").default ?? require("bs58");
 const { chromium } = require("/home/claude/.npm-global/lib/node_modules/playwright");
 
